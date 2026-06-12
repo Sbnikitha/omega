@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "langfuse": {
+      "command": "npx",
+      "args": ["-y", "@langfuse/mcp-server"],
+      "env": {
+        "LANGFUSE_PUBLIC_KEY": "${LANGFUSE_PUBLIC_KEY}",
+        "LANGFUSE_SECRET_KEY": "${LANGFUSE_SECRET_KEY}",
+        "LANGFUSE_HOST": "https://cloud.langfuse.com"
+      }
+    }
+  },
+  "omega_queries": [
+    "Show me all incidents where OMEGA was wrong in the last 7 days",
+    "Which service has the highest average LLM cost per incident?",
+    "Compare root cause accuracy between prompt v3 and v4",
+    "Why did our Scientist agent fail on database incidents?"
+  ],
+  "dashboard_fallback": "POST /query on OMEGA API mirrors MCP natural-language incident search when MCP is unavailable"
+}

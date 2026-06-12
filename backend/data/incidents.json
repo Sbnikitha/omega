@@ -1,0 +1,6332 @@
+[
+  {
+    "incident_id": "bd837f02-d369-4087-a857-ec60faadc870",
+    "trace_id": "bd837f02-d369-4087-a857-ec60faadc870",
+    "event": {
+      "type": "cpu_spike",
+      "service": "cache",
+      "severity": 0.46,
+      "timestamp": "2026-03-14T18:31:47.501804",
+      "metrics": {
+        "error_rate": 0.076,
+        "p99_ms": 657
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "bd837f02-d369-4087-a857-ec60faadc870",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.46,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-14T18:31:47.501804",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.076,
+        "p99_ms": 657
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.502002",
+    "resolved_at": "2026-06-12T18:31:47.510300"
+  },
+  {
+    "incident_id": "1d995461-3ca5-410b-8291-1ae76dfad4a9",
+    "trace_id": "1d995461-3ca5-410b-8291-1ae76dfad4a9",
+    "event": {
+      "type": "cpu_spike",
+      "service": "database",
+      "severity": 0.75,
+      "timestamp": "2026-03-15T18:31:47.510489",
+      "metrics": {
+        "error_rate": 0.182,
+        "p99_ms": 1636
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "1d995461-3ca5-410b-8291-1ae76dfad4a9",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.75,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-15T18:31:47.510489",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.182,
+        "p99_ms": 1636
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.510509",
+    "resolved_at": "2026-06-12T18:31:47.514618"
+  },
+  {
+    "incident_id": "8fb25e44-6f90-4faa-9e34-cb71152782f7",
+    "trace_id": "8fb25e44-6f90-4faa-9e34-cb71152782f7",
+    "event": {
+      "type": "latency_spike",
+      "service": "api-gateway",
+      "severity": 0.96,
+      "timestamp": "2026-03-16T18:31:47.514817",
+      "metrics": {
+        "error_rate": 0.091,
+        "p99_ms": 389
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "8fb25e44-6f90-4faa-9e34-cb71152782f7",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.96,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-16T18:31:47.514817",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.091,
+        "p99_ms": 389
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.514834",
+    "resolved_at": "2026-06-12T18:31:47.521233"
+  },
+  {
+    "incident_id": "5705657b-94ef-469b-ba05-fa8984e80ccb",
+    "trace_id": "5705657b-94ef-469b-ba05-fa8984e80ccb",
+    "event": {
+      "type": "deploy_failure",
+      "service": "auth",
+      "severity": 0.61,
+      "timestamp": "2026-03-17T18:31:47.521564",
+      "metrics": {
+        "error_rate": 0.161,
+        "p99_ms": 1964
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "5705657b-94ef-469b-ba05-fa8984e80ccb",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.61,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-17T18:31:47.521564",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.161,
+        "p99_ms": 1964
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.521591",
+    "resolved_at": "2026-06-12T18:31:47.525861"
+  },
+  {
+    "incident_id": "abe994fe-e1d7-41f6-b865-eb00a41e4bae",
+    "trace_id": "abe994fe-e1d7-41f6-b865-eb00a41e4bae",
+    "event": {
+      "type": "error_rate",
+      "service": "payments",
+      "severity": 0.69,
+      "timestamp": "2026-03-18T18:31:47.526093",
+      "metrics": {
+        "error_rate": 0.21,
+        "p99_ms": 533
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "abe994fe-e1d7-41f6-b865-eb00a41e4bae",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.69,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-18T18:31:47.526093",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.21,
+        "p99_ms": 533
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.526108",
+    "resolved_at": "2026-06-12T18:31:47.530021"
+  },
+  {
+    "incident_id": "72c31d24-7937-4541-a55b-35fb473a7887",
+    "trace_id": "72c31d24-7937-4541-a55b-35fb473a7887",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.65,
+      "timestamp": "2026-03-19T18:31:47.530234",
+      "metrics": {
+        "error_rate": 0.247,
+        "p99_ms": 1510
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "72c31d24-7937-4541-a55b-35fb473a7887",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.65,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-19T18:31:47.530234",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.247,
+        "p99_ms": 1510
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.530248",
+    "resolved_at": "2026-06-12T18:31:47.534546"
+  },
+  {
+    "incident_id": "ef2d89f5-2d26-448f-937f-c26fff907e5b",
+    "trace_id": "ef2d89f5-2d26-448f-937f-c26fff907e5b",
+    "event": {
+      "type": "latency_spike",
+      "service": "auth",
+      "severity": 0.93,
+      "timestamp": "2026-03-20T18:31:47.535162",
+      "metrics": {
+        "error_rate": 0.146,
+        "p99_ms": 1670
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "ef2d89f5-2d26-448f-937f-c26fff907e5b",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.93,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-20T18:31:47.535162",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.146,
+        "p99_ms": 1670
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.535191",
+    "resolved_at": "2026-06-12T18:31:47.539573"
+  },
+  {
+    "incident_id": "9e5c68b6-8604-4ad6-9199-eb3fd08194ea",
+    "trace_id": "9e5c68b6-8604-4ad6-9199-eb3fd08194ea",
+    "event": {
+      "type": "database_timeout",
+      "service": "frontend",
+      "severity": 0.76,
+      "timestamp": "2026-03-21T18:31:47.539863",
+      "metrics": {
+        "error_rate": 0.225,
+        "p99_ms": 1017
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "9e5c68b6-8604-4ad6-9199-eb3fd08194ea",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.76,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-21T18:31:47.539863",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.225,
+        "p99_ms": 1017
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.539876",
+    "resolved_at": "2026-06-12T18:31:47.543981"
+  },
+  {
+    "incident_id": "d1e7e3a0-26a2-4b8e-9cec-a5308c732bf5",
+    "trace_id": "d1e7e3a0-26a2-4b8e-9cec-a5308c732bf5",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.77,
+      "timestamp": "2026-03-22T18:31:47.544280",
+      "metrics": {
+        "error_rate": 0.102,
+        "p99_ms": 1420
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "d1e7e3a0-26a2-4b8e-9cec-a5308c732bf5",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.77,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-22T18:31:47.544280",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.102,
+        "p99_ms": 1420
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.544297",
+    "resolved_at": "2026-06-12T18:31:47.548443"
+  },
+  {
+    "incident_id": "5ecdcf80-5209-4f56-b4c2-42af3fb204b0",
+    "trace_id": "5ecdcf80-5209-4f56-b4c2-42af3fb204b0",
+    "event": {
+      "type": "database_timeout",
+      "service": "frontend",
+      "severity": 0.63,
+      "timestamp": "2026-03-23T18:31:47.548758",
+      "metrics": {
+        "error_rate": 0.08,
+        "p99_ms": 523
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "5ecdcf80-5209-4f56-b4c2-42af3fb204b0",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.63,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-23T18:31:47.548758",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.08,
+        "p99_ms": 523
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.548774",
+    "resolved_at": "2026-06-12T18:31:47.553679"
+  },
+  {
+    "incident_id": "b4563e71-caca-4979-8d8f-891f7a6b9cf9",
+    "trace_id": "b4563e71-caca-4979-8d8f-891f7a6b9cf9",
+    "event": {
+      "type": "database_timeout",
+      "service": "frontend",
+      "severity": 0.72,
+      "timestamp": "2026-03-24T18:31:47.554076",
+      "metrics": {
+        "error_rate": 0.058,
+        "p99_ms": 965
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "b4563e71-caca-4979-8d8f-891f7a6b9cf9",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.72,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-24T18:31:47.554076",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.058,
+        "p99_ms": 965
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.554097",
+    "resolved_at": "2026-06-12T18:31:47.559454"
+  },
+  {
+    "incident_id": "a4c2a90c-5548-4d1e-b739-8bd0655be7b4",
+    "trace_id": "a4c2a90c-5548-4d1e-b739-8bd0655be7b4",
+    "event": {
+      "type": "latency_spike",
+      "service": "frontend",
+      "severity": 0.48,
+      "timestamp": "2026-03-25T18:31:47.559859",
+      "metrics": {
+        "error_rate": 0.221,
+        "p99_ms": 361
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "a4c2a90c-5548-4d1e-b739-8bd0655be7b4",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.48,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-25T18:31:47.559859",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.221,
+        "p99_ms": 361
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.559882",
+    "resolved_at": "2026-06-12T18:31:47.564062"
+  },
+  {
+    "incident_id": "12afbf3f-a09c-4955-acc8-05228fd22b43",
+    "trace_id": "12afbf3f-a09c-4955-acc8-05228fd22b43",
+    "event": {
+      "type": "deploy_failure",
+      "service": "frontend",
+      "severity": 0.91,
+      "timestamp": "2026-03-26T18:31:47.564445",
+      "metrics": {
+        "error_rate": 0.112,
+        "p99_ms": 633
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "12afbf3f-a09c-4955-acc8-05228fd22b43",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.91,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-26T18:31:47.564445",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.112,
+        "p99_ms": 633
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.564467",
+    "resolved_at": "2026-06-12T18:31:47.569245"
+  },
+  {
+    "incident_id": "d25cb2a6-f265-4871-93b4-997f6d554a8c",
+    "trace_id": "d25cb2a6-f265-4871-93b4-997f6d554a8c",
+    "event": {
+      "type": "cpu_spike",
+      "service": "payments",
+      "severity": 0.58,
+      "timestamp": "2026-03-27T18:31:47.569703",
+      "metrics": {
+        "error_rate": 0.025,
+        "p99_ms": 243
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "d25cb2a6-f265-4871-93b4-997f6d554a8c",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.58,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-27T18:31:47.569703",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.025,
+        "p99_ms": 243
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.569725",
+    "resolved_at": "2026-06-12T18:31:47.573980"
+  },
+  {
+    "incident_id": "63641ca4-46cc-4144-8ee9-6bd76be3e66c",
+    "trace_id": "63641ca4-46cc-4144-8ee9-6bd76be3e66c",
+    "event": {
+      "type": "deploy_failure",
+      "service": "auth",
+      "severity": 0.58,
+      "timestamp": "2026-03-28T18:31:47.574346",
+      "metrics": {
+        "error_rate": 0.171,
+        "p99_ms": 638
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "63641ca4-46cc-4144-8ee9-6bd76be3e66c",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.58,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-28T18:31:47.574346",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.171,
+        "p99_ms": 638
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.574360",
+    "resolved_at": "2026-06-12T18:31:47.578351"
+  },
+  {
+    "incident_id": "27d7031a-fdd1-492d-bdd4-745185b7779f",
+    "trace_id": "27d7031a-fdd1-492d-bdd4-745185b7779f",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.64,
+      "timestamp": "2026-03-29T18:31:47.578840",
+      "metrics": {
+        "error_rate": 0.109,
+        "p99_ms": 1969
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "27d7031a-fdd1-492d-bdd4-745185b7779f",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.64,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-29T18:31:47.578840",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.109,
+        "p99_ms": 1969
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.578859",
+    "resolved_at": "2026-06-12T18:31:47.582762"
+  },
+  {
+    "incident_id": "9c5290d9-0225-4eed-9ab3-91bc89a5b062",
+    "trace_id": "9c5290d9-0225-4eed-9ab3-91bc89a5b062",
+    "event": {
+      "type": "deploy_failure",
+      "service": "api-gateway",
+      "severity": 0.69,
+      "timestamp": "2026-03-30T18:31:47.583172",
+      "metrics": {
+        "error_rate": 0.111,
+        "p99_ms": 770
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "9c5290d9-0225-4eed-9ab3-91bc89a5b062",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.69,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-30T18:31:47.583172",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.111,
+        "p99_ms": 770
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.583186",
+    "resolved_at": "2026-06-12T18:31:47.587854"
+  },
+  {
+    "incident_id": "701a9580-be58-4508-a939-90d00e20b8e9",
+    "trace_id": "701a9580-be58-4508-a939-90d00e20b8e9",
+    "event": {
+      "type": "cpu_spike",
+      "service": "auth",
+      "severity": 0.94,
+      "timestamp": "2026-03-31T18:31:47.588353",
+      "metrics": {
+        "error_rate": 0.214,
+        "p99_ms": 540
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "701a9580-be58-4508-a939-90d00e20b8e9",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.94,
+      "severity_label": "HIGH",
+      "classified_at": "2026-03-31T18:31:47.588353",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.214,
+        "p99_ms": 540
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.588374",
+    "resolved_at": "2026-06-12T18:31:47.592386"
+  },
+  {
+    "incident_id": "37955623-2772-4754-b8d9-354fb4599acb",
+    "trace_id": "37955623-2772-4754-b8d9-354fb4599acb",
+    "event": {
+      "type": "error_rate",
+      "service": "payments",
+      "severity": 0.67,
+      "timestamp": "2026-04-01T18:31:47.592837",
+      "metrics": {
+        "error_rate": 0.24,
+        "p99_ms": 1804
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "37955623-2772-4754-b8d9-354fb4599acb",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.67,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-01T18:31:47.592837",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.24,
+        "p99_ms": 1804
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.592853",
+    "resolved_at": "2026-06-12T18:31:47.598511"
+  },
+  {
+    "incident_id": "0918a2ed-b171-47a9-8447-4a5459a6bf8c",
+    "trace_id": "0918a2ed-b171-47a9-8447-4a5459a6bf8c",
+    "event": {
+      "type": "cpu_spike",
+      "service": "auth",
+      "severity": 0.76,
+      "timestamp": "2026-04-02T18:31:47.599043",
+      "metrics": {
+        "error_rate": 0.131,
+        "p99_ms": 1946
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "0918a2ed-b171-47a9-8447-4a5459a6bf8c",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.76,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-02T18:31:47.599043",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.131,
+        "p99_ms": 1946
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.599062",
+    "resolved_at": "2026-06-12T18:31:47.604190"
+  },
+  {
+    "incident_id": "655b72cd-e257-4de6-8c02-d14dd9d900de",
+    "trace_id": "655b72cd-e257-4de6-8c02-d14dd9d900de",
+    "event": {
+      "type": "latency_spike",
+      "service": "database",
+      "severity": 0.76,
+      "timestamp": "2026-04-03T18:31:47.604798",
+      "metrics": {
+        "error_rate": 0.02,
+        "p99_ms": 367
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "655b72cd-e257-4de6-8c02-d14dd9d900de",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.76,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-03T18:31:47.604798",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.02,
+        "p99_ms": 367
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.604821",
+    "resolved_at": "2026-06-12T18:31:47.608849"
+  },
+  {
+    "incident_id": "e3567eae-59b9-4175-b449-f5a4e5f230c4",
+    "trace_id": "e3567eae-59b9-4175-b449-f5a4e5f230c4",
+    "event": {
+      "type": "database_timeout",
+      "service": "cache",
+      "severity": 0.61,
+      "timestamp": "2026-04-04T18:31:47.609365",
+      "metrics": {
+        "error_rate": 0.086,
+        "p99_ms": 1739
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "e3567eae-59b9-4175-b449-f5a4e5f230c4",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.61,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-04T18:31:47.609365",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.086,
+        "p99_ms": 1739
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.609380",
+    "resolved_at": "2026-06-12T18:31:47.613334"
+  },
+  {
+    "incident_id": "b9d7cde2-a2ce-4f24-a375-28ed83a25849",
+    "trace_id": "b9d7cde2-a2ce-4f24-a375-28ed83a25849",
+    "event": {
+      "type": "cpu_spike",
+      "service": "frontend",
+      "severity": 0.92,
+      "timestamp": "2026-04-05T18:31:47.613851",
+      "metrics": {
+        "error_rate": 0.099,
+        "p99_ms": 523
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "b9d7cde2-a2ce-4f24-a375-28ed83a25849",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.92,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-05T18:31:47.613851",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.099,
+        "p99_ms": 523
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.613865",
+    "resolved_at": "2026-06-12T18:31:47.618321"
+  },
+  {
+    "incident_id": "e6e967e1-a792-4ff3-b1e2-5a8a76cdc0a1",
+    "trace_id": "e6e967e1-a792-4ff3-b1e2-5a8a76cdc0a1",
+    "event": {
+      "type": "cpu_spike",
+      "service": "cache",
+      "severity": 0.95,
+      "timestamp": "2026-04-06T18:31:47.618982",
+      "metrics": {
+        "error_rate": 0.042,
+        "p99_ms": 436
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "e6e967e1-a792-4ff3-b1e2-5a8a76cdc0a1",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.95,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-06T18:31:47.618982",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.042,
+        "p99_ms": 436
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.619001",
+    "resolved_at": "2026-06-12T18:31:47.623055"
+  },
+  {
+    "incident_id": "4270c835-ad1d-4bcb-a25b-3a7b0d229267",
+    "trace_id": "4270c835-ad1d-4bcb-a25b-3a7b0d229267",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.58,
+      "timestamp": "2026-04-07T18:31:47.623636",
+      "metrics": {
+        "error_rate": 0.228,
+        "p99_ms": 304
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "4270c835-ad1d-4bcb-a25b-3a7b0d229267",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.58,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-07T18:31:47.623636",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.228,
+        "p99_ms": 304
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.623653",
+    "resolved_at": "2026-06-12T18:31:47.627665"
+  },
+  {
+    "incident_id": "26d007e9-8e39-4c76-8142-6791f2fd7568",
+    "trace_id": "26d007e9-8e39-4c76-8142-6791f2fd7568",
+    "event": {
+      "type": "database_timeout",
+      "service": "database",
+      "severity": 0.68,
+      "timestamp": "2026-04-08T18:31:47.628263",
+      "metrics": {
+        "error_rate": 0.012,
+        "p99_ms": 354
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "26d007e9-8e39-4c76-8142-6791f2fd7568",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.68,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-08T18:31:47.628263",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.012,
+        "p99_ms": 354
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.628280",
+    "resolved_at": "2026-06-12T18:31:47.632190"
+  },
+  {
+    "incident_id": "ba6f49c0-a6c6-4654-904c-64921620317f",
+    "trace_id": "ba6f49c0-a6c6-4654-904c-64921620317f",
+    "event": {
+      "type": "cpu_spike",
+      "service": "frontend",
+      "severity": 0.93,
+      "timestamp": "2026-04-09T18:31:47.632775",
+      "metrics": {
+        "error_rate": 0.06,
+        "p99_ms": 711
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "ba6f49c0-a6c6-4654-904c-64921620317f",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.93,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-09T18:31:47.632775",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.06,
+        "p99_ms": 711
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.632789",
+    "resolved_at": "2026-06-12T18:31:47.638742"
+  },
+  {
+    "incident_id": "0905c8cf-84bc-4343-81d9-0651cc4a3615",
+    "trace_id": "0905c8cf-84bc-4343-81d9-0651cc4a3615",
+    "event": {
+      "type": "latency_spike",
+      "service": "api-gateway",
+      "severity": 0.92,
+      "timestamp": "2026-04-10T18:31:47.639433",
+      "metrics": {
+        "error_rate": 0.016,
+        "p99_ms": 1708
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "0905c8cf-84bc-4343-81d9-0651cc4a3615",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.92,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-10T18:31:47.639433",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.016,
+        "p99_ms": 1708
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.639458",
+    "resolved_at": "2026-06-12T18:31:47.643511"
+  },
+  {
+    "incident_id": "3633f652-eb31-4abd-9cb1-fc010c3c4d8f",
+    "trace_id": "3633f652-eb31-4abd-9cb1-fc010c3c4d8f",
+    "event": {
+      "type": "cpu_spike",
+      "service": "payments",
+      "severity": 0.91,
+      "timestamp": "2026-04-11T18:31:47.644142",
+      "metrics": {
+        "error_rate": 0.063,
+        "p99_ms": 1872
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "3633f652-eb31-4abd-9cb1-fc010c3c4d8f",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.91,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-11T18:31:47.644142",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.063,
+        "p99_ms": 1872
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.644157",
+    "resolved_at": "2026-06-12T18:31:47.648042"
+  },
+  {
+    "incident_id": "463ca4c9-4936-42db-95d2-1b9c0e309e8e",
+    "trace_id": "463ca4c9-4936-42db-95d2-1b9c0e309e8e",
+    "event": {
+      "type": "error_rate",
+      "service": "auth",
+      "severity": 0.64,
+      "timestamp": "2026-04-12T18:31:47.648685",
+      "metrics": {
+        "error_rate": 0.132,
+        "p99_ms": 1591
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "463ca4c9-4936-42db-95d2-1b9c0e309e8e",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.64,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-12T18:31:47.648685",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.132,
+        "p99_ms": 1591
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.648701",
+    "resolved_at": "2026-06-12T18:31:47.653323"
+  },
+  {
+    "incident_id": "d203f62b-d320-4d28-ae56-5ef128be248f",
+    "trace_id": "d203f62b-d320-4d28-ae56-5ef128be248f",
+    "event": {
+      "type": "deploy_failure",
+      "service": "auth",
+      "severity": 0.68,
+      "timestamp": "2026-04-13T18:31:47.654116",
+      "metrics": {
+        "error_rate": 0.185,
+        "p99_ms": 842
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "d203f62b-d320-4d28-ae56-5ef128be248f",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.68,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-13T18:31:47.654116",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.185,
+        "p99_ms": 842
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.654137",
+    "resolved_at": "2026-06-12T18:31:47.658023"
+  },
+  {
+    "incident_id": "297b22d6-8206-4846-9d91-d899a3a7b45f",
+    "trace_id": "297b22d6-8206-4846-9d91-d899a3a7b45f",
+    "event": {
+      "type": "database_timeout",
+      "service": "database",
+      "severity": 0.83,
+      "timestamp": "2026-04-14T18:31:47.658720",
+      "metrics": {
+        "error_rate": 0.188,
+        "p99_ms": 1573
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "297b22d6-8206-4846-9d91-d899a3a7b45f",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.83,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-14T18:31:47.658720",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.188,
+        "p99_ms": 1573
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.658734",
+    "resolved_at": "2026-06-12T18:31:47.662582"
+  },
+  {
+    "incident_id": "332f1dec-4a1f-46fc-b211-a1ede1f9e5d2",
+    "trace_id": "332f1dec-4a1f-46fc-b211-a1ede1f9e5d2",
+    "event": {
+      "type": "error_rate",
+      "service": "database",
+      "severity": 0.8,
+      "timestamp": "2026-04-15T18:31:47.663240",
+      "metrics": {
+        "error_rate": 0.088,
+        "p99_ms": 1627
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "332f1dec-4a1f-46fc-b211-a1ede1f9e5d2",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.8,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-15T18:31:47.663240",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.088,
+        "p99_ms": 1627
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.663253",
+    "resolved_at": "2026-06-12T18:31:47.667199"
+  },
+  {
+    "incident_id": "ac5dd766-b150-4739-a647-ae47485bd479",
+    "trace_id": "ac5dd766-b150-4739-a647-ae47485bd479",
+    "event": {
+      "type": "cpu_spike",
+      "service": "database",
+      "severity": 0.61,
+      "timestamp": "2026-04-16T18:31:47.668488",
+      "metrics": {
+        "error_rate": 0.06,
+        "p99_ms": 1809
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "ac5dd766-b150-4739-a647-ae47485bd479",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.61,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-16T18:31:47.668488",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.06,
+        "p99_ms": 1809
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.668515",
+    "resolved_at": "2026-06-12T18:31:47.674357"
+  },
+  {
+    "incident_id": "81af0e9c-432f-4fe9-b69b-6ef3b01d0634",
+    "trace_id": "81af0e9c-432f-4fe9-b69b-6ef3b01d0634",
+    "event": {
+      "type": "database_timeout",
+      "service": "api-gateway",
+      "severity": 0.49,
+      "timestamp": "2026-04-17T18:31:47.675279",
+      "metrics": {
+        "error_rate": 0.134,
+        "p99_ms": 1496
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "81af0e9c-432f-4fe9-b69b-6ef3b01d0634",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.49,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-17T18:31:47.675279",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.134,
+        "p99_ms": 1496
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.675303",
+    "resolved_at": "2026-06-12T18:31:47.679403"
+  },
+  {
+    "incident_id": "29ebc6b9-94af-482f-b952-951fa9bb7e6d",
+    "trace_id": "29ebc6b9-94af-482f-b952-951fa9bb7e6d",
+    "event": {
+      "type": "deploy_failure",
+      "service": "payments",
+      "severity": 0.9,
+      "timestamp": "2026-04-18T18:31:47.680136",
+      "metrics": {
+        "error_rate": 0.027,
+        "p99_ms": 1048
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "29ebc6b9-94af-482f-b952-951fa9bb7e6d",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.9,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-18T18:31:47.680136",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.027,
+        "p99_ms": 1048
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.680151",
+    "resolved_at": "2026-06-12T18:31:47.684126"
+  },
+  {
+    "incident_id": "0a49d3b5-eb8f-4163-b1c5-51ef84b3c9a9",
+    "trace_id": "0a49d3b5-eb8f-4163-b1c5-51ef84b3c9a9",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.57,
+      "timestamp": "2026-04-19T18:31:47.685444",
+      "metrics": {
+        "error_rate": 0.203,
+        "p99_ms": 1625
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "0a49d3b5-eb8f-4163-b1c5-51ef84b3c9a9",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.57,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-19T18:31:47.685444",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.203,
+        "p99_ms": 1625
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.685491",
+    "resolved_at": "2026-06-12T18:31:47.689627"
+  },
+  {
+    "incident_id": "b91f3d47-3cd8-43c3-a9f8-7c324ffe7fb0",
+    "trace_id": "b91f3d47-3cd8-43c3-a9f8-7c324ffe7fb0",
+    "event": {
+      "type": "error_rate",
+      "service": "database",
+      "severity": 0.95,
+      "timestamp": "2026-04-20T18:31:47.690444",
+      "metrics": {
+        "error_rate": 0.224,
+        "p99_ms": 1454
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "b91f3d47-3cd8-43c3-a9f8-7c324ffe7fb0",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.95,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-20T18:31:47.690444",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.224,
+        "p99_ms": 1454
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.690459",
+    "resolved_at": "2026-06-12T18:31:47.694554"
+  },
+  {
+    "incident_id": "1ecce860-fdc6-44b3-83f9-073d337d542e",
+    "trace_id": "1ecce860-fdc6-44b3-83f9-073d337d542e",
+    "event": {
+      "type": "database_timeout",
+      "service": "api-gateway",
+      "severity": 0.6,
+      "timestamp": "2026-04-21T18:31:47.695367",
+      "metrics": {
+        "error_rate": 0.197,
+        "p99_ms": 1192
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "1ecce860-fdc6-44b3-83f9-073d337d542e",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.6,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-21T18:31:47.695367",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.197,
+        "p99_ms": 1192
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.695382",
+    "resolved_at": "2026-06-12T18:31:47.699436"
+  },
+  {
+    "incident_id": "98ebc7e9-09d7-456b-8be7-87c4f3dcfeab",
+    "trace_id": "98ebc7e9-09d7-456b-8be7-87c4f3dcfeab",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.82,
+      "timestamp": "2026-04-22T18:31:47.700222",
+      "metrics": {
+        "error_rate": 0.18,
+        "p99_ms": 331
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "98ebc7e9-09d7-456b-8be7-87c4f3dcfeab",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.82,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-22T18:31:47.700222",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.18,
+        "p99_ms": 331
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.700236",
+    "resolved_at": "2026-06-12T18:31:47.704786"
+  },
+  {
+    "incident_id": "c92523b5-9eff-40a2-bff0-120c4f40218e",
+    "trace_id": "c92523b5-9eff-40a2-bff0-120c4f40218e",
+    "event": {
+      "type": "deploy_failure",
+      "service": "auth",
+      "severity": 0.65,
+      "timestamp": "2026-04-23T18:31:47.705660",
+      "metrics": {
+        "error_rate": 0.011,
+        "p99_ms": 920
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "c92523b5-9eff-40a2-bff0-120c4f40218e",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.65,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-23T18:31:47.705660",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.011,
+        "p99_ms": 920
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.705683",
+    "resolved_at": "2026-06-12T18:31:47.709603"
+  },
+  {
+    "incident_id": "0d227a38-a0cd-4cce-a5a8-0e46535aece0",
+    "trace_id": "0d227a38-a0cd-4cce-a5a8-0e46535aece0",
+    "event": {
+      "type": "latency_spike",
+      "service": "payments",
+      "severity": 0.59,
+      "timestamp": "2026-04-24T18:31:47.710412",
+      "metrics": {
+        "error_rate": 0.127,
+        "p99_ms": 996
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "0d227a38-a0cd-4cce-a5a8-0e46535aece0",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.59,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-24T18:31:47.710412",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.127,
+        "p99_ms": 996
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.710425",
+    "resolved_at": "2026-06-12T18:31:47.716052"
+  },
+  {
+    "incident_id": "d1b28e78-5789-4370-b103-0281c3854575",
+    "trace_id": "d1b28e78-5789-4370-b103-0281c3854575",
+    "event": {
+      "type": "deploy_failure",
+      "service": "payments",
+      "severity": 0.75,
+      "timestamp": "2026-04-25T18:31:47.716981",
+      "metrics": {
+        "error_rate": 0.017,
+        "p99_ms": 1516
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "d1b28e78-5789-4370-b103-0281c3854575",
+      "event_type": "connection_pool_exhaustion",
+      "service": "payments",
+      "severity": 0.75,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-25T18:31:47.716981",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.017,
+        "p99_ms": 1516
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "rejected",
+    "human_approved": false,
+    "human_feedback_reason": "Root cause missed secondary failure",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.717000",
+    "resolved_at": "2026-06-12T18:31:47.721834"
+  },
+  {
+    "incident_id": "48029ca8-a554-48f3-a877-ec52b9d9d702",
+    "trace_id": "48029ca8-a554-48f3-a877-ec52b9d9d702",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.58,
+      "timestamp": "2026-04-26T18:31:47.722863",
+      "metrics": {
+        "error_rate": 0.03,
+        "p99_ms": 239
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "48029ca8-a554-48f3-a877-ec52b9d9d702",
+      "event_type": "connection_pool_exhaustion",
+      "service": "frontend",
+      "severity": 0.58,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-26T18:31:47.722863",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.03,
+        "p99_ms": 239
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.722882",
+    "resolved_at": "2026-06-12T18:31:47.726813"
+  },
+  {
+    "incident_id": "fc52472a-8788-4478-a2a2-24069f0db726",
+    "trace_id": "fc52472a-8788-4478-a2a2-24069f0db726",
+    "event": {
+      "type": "latency_spike",
+      "service": "api-gateway",
+      "severity": 0.89,
+      "timestamp": "2026-04-27T18:31:47.727668",
+      "metrics": {
+        "error_rate": 0.159,
+        "p99_ms": 688
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "fc52472a-8788-4478-a2a2-24069f0db726",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.89,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-27T18:31:47.727668",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.159,
+        "p99_ms": 688
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.727683",
+    "resolved_at": "2026-06-12T18:31:47.731689"
+  },
+  {
+    "incident_id": "8cc32abf-1f70-40c5-a1d1-01eaa0d80488",
+    "trace_id": "8cc32abf-1f70-40c5-a1d1-01eaa0d80488",
+    "event": {
+      "type": "database_timeout",
+      "service": "cache",
+      "severity": 0.51,
+      "timestamp": "2026-04-28T18:31:47.732615",
+      "metrics": {
+        "error_rate": 0.207,
+        "p99_ms": 837
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "8cc32abf-1f70-40c5-a1d1-01eaa0d80488",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.51,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-28T18:31:47.732615",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.207,
+        "p99_ms": 837
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.732633",
+    "resolved_at": "2026-06-12T18:31:47.737169"
+  },
+  {
+    "incident_id": "117c609d-680e-4a4e-a2ae-f160a0a20554",
+    "trace_id": "117c609d-680e-4a4e-a2ae-f160a0a20554",
+    "event": {
+      "type": "database_timeout",
+      "service": "cache",
+      "severity": 0.58,
+      "timestamp": "2026-04-29T18:31:47.738186",
+      "metrics": {
+        "error_rate": 0.177,
+        "p99_ms": 817
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "117c609d-680e-4a4e-a2ae-f160a0a20554",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.58,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-29T18:31:47.738186",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.177,
+        "p99_ms": 817
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.738206",
+    "resolved_at": "2026-06-12T18:31:47.742454"
+  },
+  {
+    "incident_id": "e8180fe6-5733-42a3-b7cf-e4d80aebf583",
+    "trace_id": "e8180fe6-5733-42a3-b7cf-e4d80aebf583",
+    "event": {
+      "type": "database_timeout",
+      "service": "database",
+      "severity": 0.63,
+      "timestamp": "2026-04-30T18:31:47.743462",
+      "metrics": {
+        "error_rate": 0.214,
+        "p99_ms": 1884
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "e8180fe6-5733-42a3-b7cf-e4d80aebf583",
+      "event_type": "connection_pool_exhaustion",
+      "service": "database",
+      "severity": 0.63,
+      "severity_label": "HIGH",
+      "classified_at": "2026-04-30T18:31:47.743462",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.214,
+        "p99_ms": 1884
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.743481",
+    "resolved_at": "2026-06-12T18:31:47.747421"
+  },
+  {
+    "incident_id": "e9036388-f73e-4d21-826b-5dbd0fcda9b4",
+    "trace_id": "e9036388-f73e-4d21-826b-5dbd0fcda9b4",
+    "event": {
+      "type": "error_rate",
+      "service": "cache",
+      "severity": 0.78,
+      "timestamp": "2026-05-01T18:31:47.749391",
+      "metrics": {
+        "error_rate": 0.231,
+        "p99_ms": 1786
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "e9036388-f73e-4d21-826b-5dbd0fcda9b4",
+      "event_type": "connection_pool_exhaustion",
+      "service": "cache",
+      "severity": 0.78,
+      "severity_label": "HIGH",
+      "classified_at": "2026-05-01T18:31:47.749391",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.231,
+        "p99_ms": 1786
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.749413",
+    "resolved_at": "2026-06-12T18:31:47.754746"
+  },
+  {
+    "incident_id": "375dce12-7c93-4b25-b7bc-4c7c09cab93c",
+    "trace_id": "375dce12-7c93-4b25-b7bc-4c7c09cab93c",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.75,
+      "timestamp": "2026-05-02T18:31:47.755879",
+      "metrics": {
+        "error_rate": 0.17,
+        "p99_ms": 888
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "375dce12-7c93-4b25-b7bc-4c7c09cab93c",
+      "event_type": "connection_pool_exhaustion",
+      "service": "api-gateway",
+      "severity": 0.75,
+      "severity_label": "HIGH",
+      "classified_at": "2026-05-02T18:31:47.755879",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.17,
+        "p99_ms": 888
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "approved",
+    "human_approved": true,
+    "human_feedback_reason": "Correct root cause and safe action",
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:31:47.755903",
+    "resolved_at": "2026-06-12T18:31:47.759894"
+  },
+  {
+    "incident_id": "6f0c795f-f834-4392-b212-26c7e3790eed",
+    "trace_id": "6f0c795f-f834-4392-b212-26c7e3790eed",
+    "event": {
+      "type": "cpu_spike",
+      "service": "auth",
+      "severity": 0.87,
+      "timestamp": "2026-06-12T18:32:40.942861",
+      "metrics": {
+        "error_rate": 0.12
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth"
+        ],
+        "auth": [
+          "database"
+        ],
+        "database": []
+      }
+    },
+    "classified": {
+      "event_id": "6f0c795f-f834-4392-b212-26c7e3790eed",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.87,
+      "severity_label": "HIGH",
+      "classified_at": "2026-06-12T18:32:40.942861",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth"
+        ],
+        "auth": [
+          "database"
+        ],
+        "database": []
+      },
+      "metrics": {
+        "error_rate": 0.12
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "awaiting_approval",
+    "human_approved": null,
+    "human_feedback_reason": null,
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:32:40.943066",
+    "resolved_at": null
+  },
+  {
+    "incident_id": "b83e8624-4b7b-42b5-a614-48dbec58653e",
+    "trace_id": "b83e8624-4b7b-42b5-a614-48dbec58653e",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.87,
+      "timestamp": "2026-06-12T18:39:55.327Z",
+      "metrics": {
+        "error_rate": 0.12,
+        "p99_ms": 1840
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      }
+    },
+    "classified": {
+      "event_id": "b83e8624-4b7b-42b5-a614-48dbec58653e",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.87,
+      "severity_label": "HIGH",
+      "classified_at": "2026-06-12T18:39:55.327Z",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth",
+          "payments"
+        ],
+        "auth": [
+          "database",
+          "cache"
+        ],
+        "payments": [
+          "database"
+        ],
+        "database": [],
+        "cache": []
+      },
+      "metrics": {
+        "error_rate": 0.12,
+        "p99_ms": 1840
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "awaiting_approval",
+    "human_approved": null,
+    "human_feedback_reason": null,
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "created_at": "2026-06-12T18:39:55.333390",
+    "resolved_at": null
+  }
+]

@@ -1,0 +1,43 @@
+name: OMEGA Golden Dataset Regression
+
+on:
+  push:
+    paths:
+      - "omega/**"
+      - ".github/workflows/omega-regression.yml"
+  pull_request:
+    paths:
+      - "omega/**"
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: omega/backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: omega/backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Seed demo incidents (demo mode)
+        env:
+          OMEGA_DEMO_MODE: "true"
+        run: python -m app.scripts.seed_synthetic_data
+
+      - name: Run golden dataset regression gate
+        env:
+          OMEGA_DEMO_MODE: "true"
+          LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+          LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+          LANGFUSE_HOST: ${{ secrets.LANGFUSE_HOST }}
+        run: python -m app.scripts.run_regression
