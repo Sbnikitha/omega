@@ -31,6 +31,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("omega")
 
 
+def _normalize_origin(url: str) -> str:
+    url = url.strip().rstrip("/")
+    if not url:
+        return url
+    if url.startswith(("http://", "https://")):
+        return url
+    return f"https://{url}"
+
+
 def _cors_origins() -> list[str]:
     settings = get_settings()
     origins = [
@@ -40,8 +49,9 @@ def _cors_origins() -> list[str]:
         "http://127.0.0.1:3001",
     ]
     for url in (settings.frontend_url, os.getenv("FRONTEND_URL", "")):
-        if url and url not in origins:
-            origins.append(url.rstrip("/"))
+        normalized = _normalize_origin(url)
+        if normalized and normalized not in origins:
+            origins.append(normalized)
     return origins
 
 

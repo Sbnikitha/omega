@@ -4,7 +4,8 @@ import type { LogLine } from "@/components/omega/AgentTerminal";
 let logCounter = 0;
 
 function line(agent: string, level: LogLine["level"], msg: string, ts = "00:00:00.000"): LogLine {
-  return { id: `log-${++logCounter}`, ts, agent, level, msg };
+  logCounter += 1;
+  return { id: `seed-${agent}-${logCounter}`, ts, agent, level, msg };
 }
 
 export const PIPELINE_SCRIPT: Record<Exclude<AgentId, "idle" | "human">, LogLine[]> = {

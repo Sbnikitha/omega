@@ -1,22 +1,30 @@
+# ONE free web service — dashboard + API, paste env ONCE in Render dashboard.
+# No credit card required for Render Hobby free tier.
+#
+# Deploy: Render Dashboard → New → Blueprint → point at repo, use this file
+#   OR rename to render.yaml if you only want single-service.
+#
+# After first deploy, set FRONTEND_URL=https://YOUR-SERVICE.onrender.com
+# (same URL for the one service). OMEGA_API_URL stays internal — see render.env.example.
+
 services:
   - type: web
-    name: omega-backend
-    runtime: python
+    name: omega
+    runtime: docker
     plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: OMEGA_RELOAD=false python run.py
-    healthCheckPath: /health
+    dockerfilePath: ./Dockerfile.render
+    healthCheckPath: /
     envVars:
-      - key: OMEGA_API_HOST
-        value: 0.0.0.0
+      - key: NODE_ENV
+        value: production
       - key: OMEGA_DEMO_MODE
         value: "true"
-      - key: FRONTEND_URL
-        fromService:
-          name: omega-web
-          type: web
-          property: host
+      - key: OMEGA_CLICKHOUSE_ENABLED
+        value: "false"
+      - key: OMEGA_PAYMENT_TOKEN
+        value: demo-paid
+      - key: OMEGA_API_URL
+        value: http://127.0.0.1:8001
       - key: LANGFUSE_PUBLIC_KEY
         sync: false
       - key: LANGFUSE_SECRET_KEY
@@ -47,26 +55,5 @@ services:
         sync: false
       - key: TFY_API_KEY
         sync: false
-      - key: OMEGA_CLICKHOUSE_ENABLED
-        value: "false"
-
-  - type: web
-    name: omega-web
-    runtime: node
-    plan: free
-    rootDir: web
-    buildCommand: npm ci && npm run build
-    startCommand: npm start
-    healthCheckPath: /
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: OMEGA_API_URL
-        fromService:
-          name: omega-backend
-          type: web
-          property: host
-      - key: OMEGA_PAYMENT_TOKEN
-        value: demo-paid
-      - key: OPENAI_API_KEY
+      - key: FRONTEND_URL
         sync: false

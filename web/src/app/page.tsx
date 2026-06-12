@@ -134,13 +134,20 @@ export default function OmegaDashboard() {
   const [publicSavings, setPublicSavings] = useState<CostSavingsSummary | null>(null);
   const [datasetModalOpen, setDatasetModalOpen] = useState(false);
   const logInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const logIdSeq = useRef(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const pushLogs = useCallback((newLines: LogLine[]) => {
-    setLogs((prev) => [...prev.slice(-120), ...newLines]);
+    setLogs((prev) => {
+      const stamped = newLines.map((line) => ({
+        ...line,
+        id: `log-${++logIdSeq.current}-${Date.now()}`,
+      }));
+      return [...prev.slice(-120), ...stamped];
+    });
   }, []);
 
   const refresh = useCallback(async () => {
@@ -213,7 +220,6 @@ export default function OmegaDashboard() {
       pushLogs([
         {
           ...ambient,
-          id: `${ambient.id}-${Date.now()}`,
           ts: new Date().toISOString().slice(11, 23),
         },
       ]);
