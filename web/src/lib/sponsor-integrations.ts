@@ -22,6 +22,13 @@ export type SponsorIntegration = {
   setupNote?: string;
 };
 
+/** Server-only vars in omega/web/.env.local (never NEXT_PUBLIC_) */
+export const WEB_ENV_SETUP: EnvVarSetup[] = [
+  { var: "OMEGA_API_URL", required: true, hint: "http://localhost:8001 — used by /api/omega proxy" },
+  { var: "OMEGA_PAYMENT_TOKEN", hint: "demo-paid — x402 receipt; injected server-side only" },
+  { var: "OPENAI_API_KEY", hint: "Copilot tab — server route /api/openui-chat only" },
+];
+
 /** All keys to flip integrations from "needs keys" → live (backend/.env) */
 export const BACKEND_ENV_SETUP: EnvVarSetup[] = [
   { var: "OMEGA_DEMO_MODE", required: true, hint: "false — required for real LLM + Pioneer live checks" },
@@ -37,7 +44,7 @@ export const BACKEND_ENV_SETUP: EnvVarSetup[] = [
   { var: "AIRBYTE_CONNECTOR_ID", hint: "optional — RSS fallback works without" },
   { var: "OMEGA_CLICKHOUSE_ENABLED", hint: "true + running ClickHouse" },
   { var: "CLICKHOUSE_HOST", hint: "localhost when using local CH" },
-  { var: "OPENAI_API_KEY", hint: "OpenUI streaming + optional LLM fallback" },
+  { var: "OPENAI_API_KEY", hint: "backend LLM fallback; also set in web/.env.local for Copilot route" },
   { var: "TFY_API_KEY" },
   { var: "TFY_HOST" },
 ];
@@ -134,9 +141,9 @@ export const SPONSOR_INTEGRATIONS: SponsorIntegration[] = [
     ],
     healthKey: "openui",
     envSetup: [
-      { var: "OPENAI_API_KEY", required: true, hint: "sk-… — also set in web/.env.local for chat route" },
+      { var: "OPENAI_API_KEY", required: true, hint: "sk-… — set in web/.env.local (server route only)" },
     ],
-    setupNote: "Frontend: NEXT_PUBLIC_OMEGA_API_URL in web/.env.local",
+    setupNote: "Frontend: OMEGA_API_URL + OPENAI_API_KEY in web/.env.local (no NEXT_PUBLIC_ secrets)",
   },
   {
     id: "senso",
@@ -317,7 +324,7 @@ export const SPONSOR_INTEGRATIONS: SponsorIntegration[] = [
     ],
     with: [
       "render.yaml — omega-backend + omega-web blueprint",
-      "fromService env linking NEXT_PUBLIC_OMEGA_API_URL",
+      "fromService env linking OMEGA_API_URL (server-only proxy)",
       "FRONTEND_URL CORS for production origin",
     ],
     outcome:

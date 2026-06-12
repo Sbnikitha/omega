@@ -4,6 +4,9 @@ backend/__pycache__/
 **/__pycache__/
 *.pyc
 backend/.env
+web/.env
+web/.env.local
+web/.env*.local
 
 # Node
 web/node_modules/

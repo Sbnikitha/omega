@@ -1,12 +1,5 @@
-const API_BASE =
-  process.env.NEXT_PUBLIC_OMEGA_API_URL?.replace(/\/$/, "") || "http://localhost:8001";
-
-const PAYMENT_TOKEN = process.env.NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN?.trim() || "";
-
-function paymentHeaders(): Record<string, string> {
-  if (!PAYMENT_TOKEN) return {};
-  return { "X-402-Payment": PAYMENT_TOKEN };
-}
+/** Proxied via /api/omega — payment token stays server-side in web/.env.local */
+const API_BASE = "/api/omega";
 
 export class PaymentRequiredError extends Error {
   detail: {
@@ -206,7 +199,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      ...paymentHeaders(),
       ...init?.headers,
     },
   });

@@ -38,15 +38,12 @@ const OMEGA_OPENAI_TOOLS = [
   },
 ];
 
-const OMEGA_API =
-  process.env.OMEGA_API_URL?.replace(/\/$/, "") ||
-  process.env.NEXT_PUBLIC_OMEGA_API_URL?.replace(/\/$/, "") ||
-  "http://127.0.0.1:8001";
+import { omegaBackendHeaders, omegaBackendUrl } from "@/lib/omega-server";
 
 async function omegaFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${OMEGA_API}${path}`, {
+  const res = await fetch(`${omegaBackendUrl()}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: omegaBackendHeaders(init?.headers),
     cache: "no-store",
   });
   if (!res.ok) throw new Error(await res.text());

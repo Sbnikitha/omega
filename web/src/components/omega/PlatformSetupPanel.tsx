@@ -7,6 +7,7 @@ import { getHealth, type HealthStatus } from "@/lib/omega-api";
 import {
   BACKEND_ENV_SETUP,
   SPONSOR_INTEGRATIONS,
+  WEB_ENV_SETUP,
 } from "@/lib/sponsor-integrations";
 
 function copyText(text: string) {
@@ -114,6 +115,35 @@ export function PlatformSetupPanel() {
                 {BACKEND_ENV_SETUP.map((row) => (
                   <tr key={row.var} className="border-t border-zinc-800/80 hover:bg-zinc-900/50">
                     <td className="px-3 py-2 text-cyan-400/90">
+                      {row.var}
+                      {row.required && <span className="text-amber-500/80 ml-1">*</span>}
+                    </td>
+                    <td className="px-3 py-2 text-zinc-500 hidden sm:table-cell">{row.hint ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
+          web/.env.local — server-only (never NEXT_PUBLIC_ for keys)
+        </p>
+        <div className="rounded-xl border border-zinc-800 overflow-hidden mb-6">
+          <div className="max-h-48 overflow-auto">
+            <table className="w-full text-left text-[11px] font-mono">
+              <thead className="sticky top-0 bg-zinc-900 text-zinc-500">
+                <tr>
+                  <th className="px-3 py-2 font-normal">Variable</th>
+                  <th className="px-3 py-2 font-normal hidden sm:table-cell">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {WEB_ENV_SETUP.map((row) => (
+                  <tr key={row.var} className="border-t border-zinc-800/80 hover:bg-zinc-900/50">
+                    <td className="px-3 py-2 text-violet-400/90">
                       {row.var}
                       {row.required && <span className="text-amber-500/80 ml-1">*</span>}
                     </td>

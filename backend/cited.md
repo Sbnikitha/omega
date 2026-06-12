@@ -27,3 +27,24 @@ Each entry is grounded in **open-web sources** (public postmortems & status page
 - **Prompt:** `scientist-root-cause@production`
 
 ---
+## message-queue · human_approved · `ac50d834`
+**Published:** 2026-06-12 22:46 UTC  
+**Service:** `message-queue` · **Severity:** 88% · **Status:** approved
+
+### OMEGA agent output
+- **Root cause (Scientist):** connection_pool_exhaustion (91% confidence)
+- **Reasoning:** Connection pool saturation propagated upstream via dependency graph.
+- **Blast radius:** auth, api-gateway, frontend
+
+- **Recommended action:** `scale`
+- **Rationale:** High severity requires human approval before pool scaling.
+
+- **Human gate:** approved — test
+
+### Observability & stack
+- **Langfuse trace:** `ac50d834-29ad-46ed-8914-9d033c910fb9`
+- **Scores:** `root_cause_quality`=0.82, `scenario_realism`=0.82, `action_safety`=0.82, `human_approval`=1.00, `resolution_accuracy`=1.00
+- **Est. manual savings:** $636 · 4.24h eng time
+- **Prompt:** `scientist-root-cause@production`
+
+---

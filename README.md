@@ -40,12 +40,12 @@ OMEGA_DEMO_MODE=true python run.py   # bypasses x402 for local demos
 ```bash
 cd web
 npm install
-cp .env.example .env.local   # optional payment token
+cp .env.example .env.local   # server-only keys (see .env.example)
 npm run dev -- -p 3001
 # open http://localhost:3001
 ```
 
-Set `NEXT_PUBLIC_OMEGA_API_URL=http://localhost:8001` in `web/.env.local` if needed.
+The dashboard calls the backend through `/api/omega/*` so `OMEGA_PAYMENT_TOKEN` and `OPENAI_API_KEY` stay server-side.
 
 ### Full stack ON (judge demo)
 
@@ -58,9 +58,9 @@ OMEGA_DEMO_MODE=false
 OMEGA_X402_ENABLED=true
 OMEGA_CLICKHOUSE_ENABLED=true   # optional
 
-# web/.env.local
-NEXT_PUBLIC_OMEGA_API_URL=http://localhost:8001
-NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN=demo-paid   # x402 receipt stub
+# web/.env.local — server-only (no NEXT_PUBLIC_ for secrets)
+OMEGA_API_URL=http://localhost:8001
+OMEGA_PAYMENT_TOKEN=demo-paid   # x402 receipt stub — injected by /api/omega proxy
 OPENAI_API_KEY=...   # Copilot tab live OpenUI
 ```
 

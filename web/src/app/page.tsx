@@ -309,7 +309,7 @@ export default function OmegaDashboard() {
     } catch (e) {
       if (e instanceof PaymentRequiredError) {
         setError(
-          `${e.message} — set NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN=demo-paid or run backend with OMEGA_DEMO_MODE=true`
+          `${e.message} — set OMEGA_PAYMENT_TOKEN=demo-paid in web/.env.local or run backend with OMEGA_DEMO_MODE=true`
         );
       } else {
         setError(e instanceof Error ? e.message : "Failed to run incident");
@@ -368,7 +368,7 @@ export default function OmegaDashboard() {
     } catch (e) {
       if (e instanceof PaymentRequiredError) {
         setError(
-          `${e.message} — set NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN=demo-paid or run backend with OMEGA_DEMO_MODE=true`
+          `${e.message} — set OMEGA_PAYMENT_TOKEN=demo-paid in web/.env.local or run backend with OMEGA_DEMO_MODE=true`
         );
       } else {
         setError(e instanceof Error ? e.message : "Replay failed");

@@ -56,12 +56,7 @@ services:
           name: omega-backend
           type: web
           property: host
-      - key: NEXT_PUBLIC_OMEGA_API_URL
-        fromService:
-          name: omega-backend
-          type: web
-          property: host
-      - key: NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN
+      - key: OMEGA_PAYMENT_TOKEN
         value: demo-paid
       - key: OPENAI_API_KEY
         sync: false
