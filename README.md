@@ -9,7 +9,7 @@ Self-improving multi-agent incident response for the **autonomous agent on the o
 
 Sponsor stack: **Langfuse** · **ClickHouse** · **OpenUI** · **Senso** · **Guild** · **Pioneer** · **Composio** · **Airbyte** · **TrueFoundry** · **Render**
 
-See **[SPONSORS.md](SPONSORS.md)** for prize-lane score analytics and env setup per sponsor.
+Live sponsor scores: `GET /sponsors` on the backend (also shown in the dashboard **Guide** tab).
 
 ## Repo structure
 

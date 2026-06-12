@@ -89,7 +89,7 @@ Real outages from GitHub, Cloudflare, AWS, Google Gmail ingested as curated publ
     (
         "industry-context",
         "2026-06-12 - Agentic Web Stack",
-        """Source: OMEGA SPONSORS.md
+        """Source: OMEGA backend sponsor analytics (GET /sponsors)
 
 Integrations: Langfuse, ClickHouse, OpenUI, Senso, Guild, Pioneer, Composio, Airbyte, TrueFoundry, Render.
 """,
