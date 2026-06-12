@@ -120,6 +120,7 @@ class IncidentState(BaseModel):
     incident_commander: str = "on-call-engineer"
     created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     resolved_at: str | None = None
+    sponsor_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class HumanFeedbackRequest(BaseModel):

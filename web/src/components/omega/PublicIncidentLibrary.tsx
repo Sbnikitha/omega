@@ -1,7 +1,6 @@
 "use client";
 
-import { CostSavingsDetail } from "@/components/omega/CostSavingsPanel";
-import type { CostSavingsRow, PublicIncidentDetail, PublicIncidentSummary } from "@/lib/omega-api";
+import type { PublicIncidentDetail, PublicIncidentSummary } from "@/lib/omega-api";
 import { ExternalLink } from "lucide-react";
 
 const SEV: Record<string, string> = {
@@ -126,7 +125,12 @@ export function PublicIncidentMinimalDetail({
           </div>
         </div>
 
-        {incident.cost_savings && <CostSavingsDetail row={incident.cost_savings} />}
+        {incident.cost_savings && (
+          <p className="text-[10px] text-zinc-600 mt-3 border-t border-zinc-800 pt-3">
+            Bridge work: {incident.cost_savings.manual_work_hours}h manual →{" "}
+            {incident.cost_savings.omega_work_hours}h with OMEGA
+          </p>
+        )}
 
         {comparison && (
           <div className="rounded-md border border-zinc-800 bg-zinc-900/50 p-4 space-y-3">

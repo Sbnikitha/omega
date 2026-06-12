@@ -6,6 +6,7 @@ from typing import Any
 
 from app.agents.graph import run_incident_pipeline
 from app.models import IncidentEvent, IncidentState
+from app.services.cited_publisher import publish_omega_incident
 from app.services.cost_savings import aggregate_public_savings, incident_savings_from_mttr
 from app.services.incidents import store
 
@@ -64,11 +65,20 @@ def replay_public_incident(incident_id: str) -> dict[str, Any]:
         raise ValueError("Public incident not found")
 
     event_data = public["omega_event"]
+    if public.get("source_url"):
+        event_data.setdefault("metrics", {})
+        event_data["metrics"]["source_url"] = public["source_url"]
     event = IncidentEvent(**event_data)
     omega = run_incident_pipeline(event)
     omega_incident_id = omega.incident_id
 
     store.save(omega)
+
+    cited_path = publish_omega_incident(
+        omega,
+        public_source=public,
+        event_type="open_web_replay",
+    )
 
     match = False
     if omega.root_cause:
@@ -92,4 +102,5 @@ def replay_public_incident(incident_id: str) -> dict[str, Any]:
             public["mttr_minutes"],
             severity=public.get("severity", "high"),
         ),
+        "cited_published": cited_path,
     }

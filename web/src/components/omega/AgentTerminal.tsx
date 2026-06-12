@@ -25,16 +25,22 @@ export function AgentTerminal({
   lines,
   title = "omega-agent-bus :: live trace stream",
   maxHeight = "320px",
+  autoScroll = false,
 }: {
   lines: LogLine[];
   title?: string;
   maxHeight?: string;
+  /** Off by default — scrollIntoView was jumping the whole page */
+  autoScroll?: boolean;
 }) {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [lines.length]);
+    if (!autoScroll) return;
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [lines.length, autoScroll]);
 
   return (
     <div className="rounded-xl border border-emerald-500/20 bg-[#020806] overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.08)]">
@@ -46,6 +52,7 @@ export function AgentTerminal({
         <span className="ml-auto font-mono text-[9px] text-emerald-600 animate-pulse">● REC</span>
       </div>
       <div
+        ref={containerRef}
         className="p-3 font-mono text-[11px] leading-relaxed overflow-y-auto custom-scrollbar relative"
         style={{ maxHeight }}
       >
@@ -64,7 +71,6 @@ export function AgentTerminal({
             </motion.div>
           ))}
         </AnimatePresence>
-        <div ref={bottomRef} />
         <span className="inline-block w-2 h-4 bg-emerald-400 animate-pulse ml-1 align-middle" />
       </div>
     </div>

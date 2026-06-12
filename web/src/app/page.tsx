@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Info,
   LayoutDashboard,
+  Database,
   Sparkles,
   Radio,
   RefreshCw,
@@ -15,9 +16,10 @@ import {
   Terminal,
   XCircle,
 } from "lucide-react";
+import { DatasetIncidentModal } from "@/components/omega/DatasetIncidentModal";
 import { CostSavingsSummaryBar, OpsCostTicker } from "@/components/omega/CostSavingsPanel";
+import { OmegaWhatIfPanel } from "@/components/omega/OmegaWhatIfPanel";
 import { GuideTab } from "@/components/omega/GuideTab";
-import { OpenUICopilot } from "@/components/omega/OpenUICopilot";
 import {
   PublicIncidentLibrary,
   PublicIncidentMinimalDetail,
@@ -53,8 +55,10 @@ import {
   listPublicIncidents,
   optimizePrompt,
   queryIncidents,
+  PaymentRequiredError,
   replayPublicIncident,
   submitFeedback,
+  type HealthStatus,
 } from "@/lib/omega-api";
 
 const DEMO_GRAPH: Record<string, string[]> = {
@@ -98,13 +102,7 @@ export default function OmegaDashboard() {
   const [selected, setSelected] = useState<Incident | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
-  const [health, setHealth] = useState<{
-    langfuse: boolean;
-    llm: boolean;
-    demo_mode: boolean;
-    clickhouse: boolean;
-    storage_backend: string;
-  } | null>(null);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
   const [nlQuery, setNlQuery] = useState("");
   const [nlResult, setNlResult] = useState("");
   const [optimizeMsg, setOptimizeMsg] = useState("");
@@ -118,7 +116,7 @@ export default function OmegaDashboard() {
   const [pipelineRunning, setPipelineRunning] = useState(false);
   const [simulationStep, setSimulationStep] = useState(-1);
   const [mounted, setMounted] = useState(false);
-  const [viewMode, setViewMode] = useState<"library" | "ops" | "guide" | "copilot">("library");
+  const [viewMode, setViewMode] = useState<"library" | "ops" | "guide">("library");
   const [publicIncidents, setPublicIncidents] = useState<PublicIncidentSummary[]>([]);
   const [selectedPublicId, setSelectedPublicId] = useState<string | null>(null);
   const [publicDetail, setPublicDetail] = useState<PublicIncidentDetail | null>(null);
@@ -134,6 +132,7 @@ export default function OmegaDashboard() {
   } | null>(null);
   const [replaying, setReplaying] = useState(false);
   const [publicSavings, setPublicSavings] = useState<CostSavingsSummary | null>(null);
+  const [datasetModalOpen, setDatasetModalOpen] = useState(false);
   const logInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -205,29 +204,6 @@ export default function OmegaDashboard() {
       cancelled = true;
     };
   }, [selectedPublicId]);
-
-  const handlePublicReplay = async () => {
-    if (!selectedPublicId) return;
-    setReplaying(true);
-    setError("");
-    try {
-      const result = await replayPublicIncident(selectedPublicId);
-      setPublicComparison({
-        root_cause_match: result.root_cause_match,
-        comparison: result.comparison,
-      });
-      setIncidents((prev) => [result.omega_incident, ...prev]);
-      setSelected(result.omega_incident);
-      setCompletedAgents(new Set(AGENT_ORDER));
-      setActiveAgent("human");
-      setViewMode("ops");
-      await refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Replay failed");
-    } finally {
-      setReplaying(false);
-    }
-  };
 
   // Ambient terminal chatter — client-only (after mount) to avoid hydration drift
   useEffect(() => {
@@ -301,24 +277,26 @@ export default function OmegaDashboard() {
     setPipelineRunning(false);
   }, [pushLogs]);
 
-  const runDemoIncident = async () => {
+  const runIncidentFromEvent = async (event: Incident["event"], logLabel: string) => {
     setRunning(true);
     setError("");
+    setViewMode("ops");
     const pipelinePromise = animatePipeline();
     try {
-      const incident = await createIncident({
-        type: "connection_pool_exhaustion",
-        service: "auth",
-        severity: 0.87,
-        timestamp: new Date().toISOString(),
-        metrics: { error_rate: 0.12, p99_ms: 1840 },
-        dependency_graph: DEMO_GRAPH,
-      });
+      const incident = await createIncident(event);
       await pipelinePromise;
       setIncidents((prev) => [incident, ...prev]);
       setSelected(incident);
       setCompletedAgents(new Set(AGENT_ORDER));
+      setActiveAgent("human");
       pushLogs([
+        {
+          id: `gen-${Date.now()}`,
+          ts: new Date().toISOString().slice(11, 23),
+          agent: "omega",
+          level: "SYS",
+          msg: `INCIDENT_GENERATED :: ${logLabel} → swarm dispatched`,
+        },
         {
           id: `done-${Date.now()}`,
           ts: new Date().toISOString().slice(11, 23),
@@ -329,10 +307,76 @@ export default function OmegaDashboard() {
       ]);
       await refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to run incident");
+      if (e instanceof PaymentRequiredError) {
+        setError(
+          `${e.message} — set NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN=demo-paid or run backend with OMEGA_DEMO_MODE=true`
+        );
+      } else {
+        setError(e instanceof Error ? e.message : "Failed to run incident");
+      }
       setActiveAgent("idle");
       setPipelineRunning(false);
     } finally {
+      setRunning(false);
+    }
+  };
+
+  const runDemoIncident = async () => {
+    await runIncidentFromEvent(
+      {
+        type: "connection_pool_exhaustion",
+        service: "auth",
+        severity: 0.87,
+        timestamp: new Date().toISOString(),
+        metrics: { error_rate: 0.12, p99_ms: 1840 },
+        dependency_graph: DEMO_GRAPH,
+      },
+      "auth connection_pool_exhaustion (demo)"
+    );
+  };
+
+  const handlePublicReplay = async (incidentId?: string) => {
+    const id = incidentId ?? selectedPublicId;
+    if (!id) return;
+    setReplaying(true);
+    setRunning(true);
+    setError("");
+    setViewMode("ops");
+    const pipelinePromise = animatePipeline();
+    try {
+      const result = await replayPublicIncident(id);
+      await pipelinePromise;
+      setPublicComparison({
+        root_cause_match: result.root_cause_match,
+        comparison: result.comparison,
+      });
+      setIncidents((prev) => [result.omega_incident, ...prev]);
+      setSelected(result.omega_incident);
+      setCompletedAgents(new Set(AGENT_ORDER));
+      setActiveAgent("human");
+      setPipelineRunning(false);
+      pushLogs([
+        {
+          id: `replay-${Date.now()}`,
+          ts: new Date().toISOString().slice(11, 23),
+          agent: "omega",
+          level: "SYS",
+          msg: `DATASET_REPLAY :: ${id} → 4-agent swarm complete`,
+        },
+      ]);
+      await refresh();
+    } catch (e) {
+      if (e instanceof PaymentRequiredError) {
+        setError(
+          `${e.message} — set NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN=demo-paid or run backend with OMEGA_DEMO_MODE=true`
+        );
+      } else {
+        setError(e instanceof Error ? e.message : "Replay failed");
+      }
+      setActiveAgent("idle");
+      setPipelineRunning(false);
+    } finally {
+      setReplaying(false);
       setRunning(false);
     }
   };
@@ -424,13 +468,15 @@ export default function OmegaDashboard() {
   };
 
   const approvalPct = Math.round((analytics?.human_approval_rate ?? 0) * 100);
-  const hotNode = pipelineRunning || running ? "auth" : selected?.event.service;
+  const hotNode =
+    pipelineRunning || running
+      ? selected?.event.service ?? "auth"
+      : selected?.event.service;
 
   const isLibrary = viewMode === "library";
   const isGuide = viewMode === "guide";
-  const isCopilot = viewMode === "copilot";
   const isMinimalChrome = isLibrary;
-  const isAnimatedChrome = isGuide || isCopilot || viewMode === "ops";
+  const isAnimatedChrome = isGuide || viewMode === "ops";
 
   return (
     <main className={`min-h-screen overflow-x-hidden ${isMinimalChrome ? "bg-zinc-950 text-zinc-100" : "bg-[#030305] text-zinc-100"}`}>
@@ -517,18 +563,6 @@ export default function OmegaDashboard() {
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode("copilot")}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  isCopilot
-                    ? "bg-fuchsia-500/25 text-fuchsia-200 border border-fuchsia-500/40 shadow-[0_0_12px_rgba(217,70,239,0.35)]"
-                    : "text-zinc-500 hover:text-fuchsia-300"
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Copilot
-              </button>
-              <button
-                type="button"
                 onClick={() => setViewMode("ops")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   viewMode === "ops" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "text-zinc-500 hover:text-zinc-300"
@@ -564,16 +598,22 @@ export default function OmegaDashboard() {
       </header>
 
       <div className="relative max-w-[1600px] mx-auto px-6 md:px-10 py-6 space-y-5">
-        {isCopilot ? (
-          <OpenUICopilot />
-        ) : isGuide ? (
-          <GuideTab analytics={analytics} clickhouseConnected={health?.clickhouse} />
+        {isGuide ? (
+          <GuideTab
+            analytics={analytics}
+            clickhouseConnected={health?.clickhouse}
+            paymentBypass={health?.payment_bypass}
+          />
         ) : isLibrary ? (
           <div className="space-y-4">
             {error && (
               <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>
             )}
             {publicSavings && <CostSavingsSummaryBar summary={publicSavings} />}
+            {selectedPublicId && (() => {
+              const summary = publicIncidents.find((i) => i.id === selectedPublicId);
+              return summary ? <OmegaWhatIfPanel incident={summary} /> : null;
+            })()}
             <div className="grid lg:grid-cols-12 gap-5">
               <div className="lg:col-span-4">
                 <PublicIncidentLibrary
@@ -586,7 +626,7 @@ export default function OmegaDashboard() {
                 {publicDetail ? (
                   <PublicIncidentMinimalDetail
                     incident={publicDetail}
-                    onReplay={handlePublicReplay}
+                    onReplay={() => handlePublicReplay()}
                     replaying={replaying}
                     comparison={publicComparison}
                   />
@@ -641,18 +681,39 @@ export default function OmegaDashboard() {
             <DependencyMesh hotNode={hotNode} cascadeNodes={pipelineRunning ? CASCADE : selected?.simulation?.cascade?.order || selected?.root_cause?.affected_services || []} />
             <CodebaseChecklist completedThrough={selected?.status === "approved" || selected?.status === "rejected" ? 10 : selected ? 7 : 3} />
 
+            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
+              <p className="text-[10px] uppercase tracking-widest text-cyan-500/80 flex items-center gap-2">
+                <Database className="w-3.5 h-3.5" />
+                Real incident dataset
+              </p>
+              <p className="text-[11px] text-zinc-500">
+                Pick a public postmortem (Google, GitHub, AWS…) and dispatch the 4-agent swarm.
+              </p>
+              <motion.button
+                type="button"
+                onClick={() => setDatasetModalOpen(true)}
+                disabled={running || replaying}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 disabled:opacity-50 text-xs font-black uppercase tracking-[0.15em] flex items-center justify-center gap-2"
+              >
+                <Database className="w-4 h-4" />
+                Choose from dataset
+              </motion.button>
+            </div>
+
             <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/50 p-4 space-y-3">
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-                <Terminal className="w-3.5 h-3.5 text-emerald-500" /> Command
+                <Terminal className="w-3.5 h-3.5 text-emerald-500" /> Quick inject
               </p>
               <motion.button
                 onClick={runDemoIncident}
                 disabled={running}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 disabled:opacity-50 text-xs font-black uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(6,182,212,0.25)] transition-all"
+                className="w-full py-2.5 rounded-xl border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 disabled:opacity-50 text-[10px] font-black uppercase tracking-[0.15em] transition-all"
               >
-                {running ? "◉ Agents Running..." : "▶ Inject Live Incident"}
+                {running ? "◉ Running…" : "▶ Demo incident (auth pool)"}
               </motion.button>
               <button
                 onClick={handleOptimize}
@@ -849,7 +910,7 @@ export default function OmegaDashboard() {
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="text-zinc-600 font-mono text-sm"
                   >
-                    awaiting incident injection...
+                    Select topics and click Generate & run agents — or pick from the incident queue
                   </motion.p>
                 </div>
               )}
@@ -859,6 +920,17 @@ export default function OmegaDashboard() {
           </>
         )}
       </div>
+
+      <DatasetIncidentModal
+        open={datasetModalOpen}
+        onClose={() => setDatasetModalOpen(false)}
+        incidents={publicIncidents}
+        running={running || replaying}
+        onRun={(id) => {
+          setSelectedPublicId(id);
+          void handlePublicReplay(id);
+        }}
+      />
     </main>
   );
 }

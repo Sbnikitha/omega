@@ -1,0 +1,67 @@
+services:
+  - type: web
+    name: omega-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: OMEGA_RELOAD=false python run.py
+    healthCheckPath: /health
+    envVars:
+      - key: OMEGA_API_HOST
+        value: 0.0.0.0
+      - key: OMEGA_DEMO_MODE
+        value: "true"
+      - key: FRONTEND_URL
+        fromService:
+          name: omega-web
+          type: web
+          property: host
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SENSO_API_KEY
+        sync: false
+      - key: SENSO_GEO_QUESTION_ID
+        sync: false
+      - key: PIONEER_API_KEY
+        sync: false
+      - key: COMPOSIO_API_KEY
+        sync: false
+      - key: AIRBYTE_CLIENT_ID
+        sync: false
+      - key: AIRBYTE_CLIENT_SECRET
+        sync: false
+      - key: AIRBYTE_CONNECTOR_ID
+        sync: false
+      - key: OMEGA_CLICKHOUSE_ENABLED
+        value: "false"
+
+  - type: web
+    name: omega-web
+    runtime: node
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OMEGA_API_URL
+        fromService:
+          name: omega-backend
+          type: web
+          property: host
+      - key: NEXT_PUBLIC_OMEGA_API_URL
+        fromService:
+          name: omega-backend
+          type: web
+          property: host
+      - key: NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN
+        value: demo-paid
+      - key: OPENAI_API_KEY
+        sync: false

@@ -5,13 +5,21 @@ from contextlib import contextmanager
 from typing import Any, Generator
 from uuid import uuid4
 
-from langfuse import Langfuse, observe
+from langfuse import Langfuse, observe, propagate_attributes
 
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
 _langfuse: Langfuse | None = None
+
+
+def normalize_langfuse_trace_id(trace_id: str) -> str:
+    """Langfuse trace IDs must be 32 lowercase hex characters (no hyphens)."""
+    cleaned = trace_id.replace("-", "").lower()
+    if len(cleaned) == 32 and all(c in "0123456789abcdef" for c in cleaned):
+        return cleaned
+    return trace_id
 
 
 def get_langfuse() -> Langfuse | None:
@@ -37,9 +45,9 @@ def incident_trace(
     metadata: dict[str, Any] | None = None,
     tags: list[str] | None = None,
 ) -> Generator[str, None, None]:
-    """Create a root trace for an incident. Yields trace_id."""
+    """Create a root trace for an incident. Yields Langfuse-compatible trace_id."""
     lf = get_langfuse()
-    trace_id = incident_id
+    trace_id = normalize_langfuse_trace_id(incident_id)
     if lf is None:
         yield trace_id
         return
@@ -50,18 +58,17 @@ def incident_trace(
         trace_context={"trace_id": trace_id},
         input=input_data,
         metadata=metadata or {},
-    ) as span:
-        span.update_trace(
-            name=name,
+    ):
+        with propagate_attributes(
             user_id="omega-operator",
             session_id=incident_id,
             tags=tags or ["omega", "incident"],
-            input=input_data,
-        )
-        try:
-            yield trace_id
-        finally:
-            lf.flush()
+            trace_name=name,
+        ):
+            try:
+                yield trace_id
+            finally:
+                lf.flush()
 
 
 def score_trace(
@@ -78,7 +85,7 @@ def score_trace(
         logger.info("Langfuse score (offline): %s=%s on %s", name, value, trace_id)
         return
     lf.create_score(
-        trace_id=trace_id,
+        trace_id=normalize_langfuse_trace_id(trace_id),
         observation_id=observation_id,
         name=name,
         value=value,
@@ -114,4 +121,11 @@ def add_dataset_item(
     lf.flush()
 
 
-__all__ = ["get_langfuse", "observe", "incident_trace", "score_trace", "add_dataset_item"]
+__all__ = [
+    "get_langfuse",
+    "observe",
+    "incident_trace",
+    "normalize_langfuse_trace_id",
+    "score_trace",
+    "add_dataset_item",
+]

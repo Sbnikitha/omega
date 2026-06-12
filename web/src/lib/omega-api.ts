@@ -1,6 +1,28 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_OMEGA_API_URL?.replace(/\/$/, "") || "http://localhost:8001";
 
+const PAYMENT_TOKEN = process.env.NEXT_PUBLIC_OMEGA_PAYMENT_TOKEN?.trim() || "";
+
+function paymentHeaders(): Record<string, string> {
+  if (!PAYMENT_TOKEN) return {};
+  return { "X-402-Payment": PAYMENT_TOKEN };
+}
+
+export class PaymentRequiredError extends Error {
+  detail: {
+    message?: string;
+    price_usd?: number;
+    instructions?: string;
+    action?: string;
+  };
+
+  constructor(detail: PaymentRequiredError["detail"]) {
+    super(detail.message || "Payment required (HTTP 402)");
+    this.name = "PaymentRequiredError";
+    this.detail = detail;
+  }
+}
+
 export type SimulationStep = {
   step_id: string;
   name: string;
@@ -182,8 +204,22 @@ export type Analytics = {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...paymentHeaders(),
+      ...init?.headers,
+    },
   });
+  if (res.status === 402) {
+    let detail: PaymentRequiredError["detail"] = {};
+    try {
+      const body = await res.json();
+      detail = body.detail ?? body;
+    } catch {
+      detail = { message: await res.text() };
+    }
+    throw new PaymentRequiredError(detail);
+  }
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
@@ -191,16 +227,51 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export type HealthStatus = {
+  status: string;
+  langfuse: boolean;
+  llm: boolean;
+  llm_provider?: string;
+  demo_mode: boolean;
+  clickhouse: boolean;
+  clickhouse_enabled?: boolean;
+  storage_backend: string;
+  x402_enabled?: boolean;
+  x402_price_usd?: number;
+  payment_bypass?: boolean;
+  sponsors?: Record<string, boolean>;
+};
+
 export async function getHealth() {
-  return request<{
-    status: string;
-    langfuse: boolean;
-    llm: boolean;
-    demo_mode: boolean;
-    clickhouse: boolean;
-    clickhouse_enabled: boolean;
-    storage_backend: string;
-  }>("/health");
+  return request<HealthStatus>("/health");
+}
+
+export async function getCited() {
+  return request<{ path: string; content: string; payment: Record<string, string>; senso_enabled?: boolean }>(
+    "/cited"
+  );
+}
+
+export type SponsorEntry = {
+  enabled: boolean;
+  depth: number;
+  score: number;
+  tier: string;
+  why: string;
+  improved: string;
+};
+
+export type SponsorReport = {
+  sponsors: Record<string, SponsorEntry>;
+  enabled_count: number;
+  enabled: string[];
+  average_score: number;
+  prize_lane_scores: Record<string, number>;
+  recommended_pitches: [string, number][];
+};
+
+export async function getSponsors() {
+  return request<SponsorReport>("/sponsors");
 }
 
 export async function listIncidents(limit = 20) {
@@ -275,6 +346,7 @@ export async function replayPublicIncident(id: string) {
     omega_incident: Incident;
     omega_incident_id: string;
     root_cause_match: boolean;
+    cited_published?: string;
     comparison: {
       real_root_cause: string;
       omega_root_cause: string | null;

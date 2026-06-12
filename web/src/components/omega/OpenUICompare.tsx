@@ -301,7 +301,7 @@ export function OpenUICompare({ embedded }: { embedded?: boolean }) {
           <span className="text-fuchsia-300">How we use OpenUI in OMEGA:</span>{" "}
           <span className="text-zinc-500">@openuidev/react-lang</span> Renderer + custom{" "}
           <span className="text-zinc-300">omegaLibrary</span> →{" "}
-          <span className="text-zinc-500">/api/openui-chat</span> streams Lang → Copilot tab queries live incidents
+          <span className="text-zinc-500">/api/openui-chat</span> streams Lang → Guide tab OpenUI compare
         </div>
       </div>
     </section>

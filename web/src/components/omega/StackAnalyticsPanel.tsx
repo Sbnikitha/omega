@@ -38,13 +38,13 @@ export function StackAnalyticsPanel({ analytics }: { analytics: Analytics | null
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-6 space-y-5">
       <div>
-        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">Per-incident sponsor usage</p>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">Per-incident stack usage</p>
         <h3 className="text-lg font-bold text-zinc-100 mt-1">
           {stack.total_incidents} OMEGA runs · one row each
         </h3>
         <p className="text-xs text-zinc-500 mt-1">
           Langfuse = trace + judge scores + human feedback · ClickHouse = how this row is stored · OpenUI = what
-          could render in Copilot for this incident
+          could render in Guide OpenUI compare for this incident
         </p>
       </div>
 

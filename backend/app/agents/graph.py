@@ -18,6 +18,8 @@ from app.models import (
     ScenarioPlan,
     Severity,
 )
+from app.services.airbyte_context import ingest_context_for_service
+from app.services.composio_tools import fetch_postmortem_context
 from app.services.incident_tracker import build_simulation, build_timeline, log_change, merge_langfuse_scores
 from app.services.llm import flush_langfuse, invoke_structured
 from app.services.prompt_manager import get_prompt
@@ -41,9 +43,23 @@ def _severity_label(score: float) -> Severity:
 def observer_node(state: GraphState) -> GraphState:
     incident = state["incident"]
     event = incident.event
+    source_url = event.metrics.get("source_url") if event.metrics else None
+
+    airbyte_ctx = ingest_context_for_service(event.service, source_url=source_url)
+    composio_ctx = fetch_postmortem_context(source_url, service=event.service)
+    incident.sponsor_metadata["airbyte"] = airbyte_ctx
+    incident.sponsor_metadata["composio"] = composio_ctx
+
     payload = {"event_json": json.dumps(event.model_dump())}
     prompt = get_prompt("observer-classify", payload)
-    result = invoke_structured("observer-classify", prompt, event.model_dump())
+    enriched = {
+        **event.model_dump(),
+        "open_web_context": {
+            "airbyte": airbyte_ctx,
+            "composio_snippet": composio_ctx.get("snippet", "")[:800] if composio_ctx.get("ok") else "",
+        },
+    }
+    result = invoke_structured("observer-classify", prompt, enriched)
 
     classified = ClassifiedEvent(
         event_id=incident.incident_id,
@@ -166,6 +182,11 @@ def response_node(state: GraphState) -> GraphState:
         requires_human_approval=requires_approval,
         rationale=result.get("rationale", ""),
     )
+    incident.sponsor_metadata["composio_execution"] = {
+        "ready": True,
+        "recommended_action": incident.action_plan.recommended_action_id,
+        "note": "Wire COMPOSIO_API_KEY for live PagerDuty/Slack/GitHub execute",
+    }
     incident.status = "awaiting_approval" if requires_approval else "auto_ready"
     log_change(
         incident,
@@ -199,7 +220,6 @@ def build_graph() -> Any:
 
 def run_incident_pipeline(event: IncidentEvent) -> IncidentState:
     incident = IncidentState(event=event)
-    incident.trace_id = incident.incident_id
 
     with incident_trace(
         incident.incident_id,
@@ -207,10 +227,12 @@ def run_incident_pipeline(event: IncidentEvent) -> IncidentState:
         input_data=event.model_dump(),
         metadata={"service": event.service, "severity": event.severity},
         tags=["omega", "incident", event.service],
-    ):
+    ) as trace_id:
+        incident.trace_id = trace_id
         graph = build_graph()
         result = graph.invoke({"incident": incident})
         incident = result["incident"]
+        incident.trace_id = trace_id
         incident.auto_scores = evaluate_incident(incident)
         merge_langfuse_scores(incident)
         if not incident.simulation:

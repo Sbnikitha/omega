@@ -10,6 +10,7 @@ from typing import Any
 from app.config import get_settings
 from app.langfuse_client import add_dataset_item, score_trace
 from app.models import HumanFeedbackRequest, IncidentEvent, IncidentState
+from app.services.cited_publisher import publish_omega_incident
 from app.services.clickhouse import clickhouse_is_active, get_clickhouse
 from app.services.cost_savings import session_savings
 from app.services.incident_tracker import build_timeline, enrich_incident, log_change, merge_langfuse_scores
@@ -151,6 +152,8 @@ class IncidentStore:
             )
 
         self.save(incident)
+        if feedback.approved:
+            publish_omega_incident(incident, event_type="human_approved")
         return incident
 
     def _all_items_raw(self) -> list[dict[str, Any]]:

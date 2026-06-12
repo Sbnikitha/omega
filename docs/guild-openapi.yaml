@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: OMEGA Incident API
+  version: 1.0.0
+  description: Guild integration operations for OMEGA multi-agent incident response
+servers:
+  - url: https://omega-backend.onrender.com
+paths:
+  /public-incidents/{incident_id}/replay:
+    post:
+      operationId: omegaReplayPublicIncident
+      summary: Replay a public postmortem through OMEGA
+      parameters:
+        - name: incident_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-402-Payment
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OMEGA analysis result
+  /feedback:
+    post:
+      operationId: omegaSubmitFeedback
+      summary: Human approve/reject incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                incident_id:
+                  type: string
+                approved:
+                  type: boolean
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Updated incident
+  /cited:
+    get:
+      operationId: omegaGetCited
+      summary: Read cited.md published output
+      responses:
+        "200":
+          description: cited.md content
