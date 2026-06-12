@@ -1,6 +1,41 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_OMEGA_API_URL?.replace(/\/$/, "") || "http://localhost:8001";
 
+export type SimulationStep = {
+  step_id: string;
+  name: string;
+  owner: string;
+  status: string;
+  timestamp: string;
+  detail: string;
+};
+
+export type SimulationState = {
+  simulation_id: string;
+  steps: SimulationStep[];
+  steps_completed: string[];
+  fault_injection: Record<string, string>;
+  cascade: { order: string[]; blast_radius_score: number; affected_count?: number };
+  aggregate_risk_score: number;
+  requires_human_approval: boolean;
+};
+
+export type TimelineEntry = {
+  state: string;
+  owner: string;
+  timestamp: string;
+  status: string;
+};
+
+export type ChangeLogEntry = {
+  timestamp: string;
+  actor: string;
+  field: string;
+  old_value?: string | null;
+  new_value: string;
+  detail: string;
+};
+
 export type Incident = {
   incident_id: string;
   trace_id?: string;
@@ -32,9 +67,95 @@ export type Incident = {
     rationale: string;
   };
   auto_scores?: Record<string, number>;
+  langfuse_scores?: Record<string, number>;
   human_approved?: boolean | null;
   human_feedback_reason?: string | null;
   span_ids?: Record<string, string>;
+  simulation?: SimulationState;
+  timeline?: TimelineEntry[];
+  change_log?: ChangeLogEntry[];
+  prompt_version?: string;
+  incident_commander?: string;
+};
+
+export type CostSavingsRow = {
+  manual_mttr_minutes: number;
+  omega_assisted_mttr_minutes: number;
+  mttr_saved_minutes: number;
+  manual_work_hours: number;
+  omega_work_hours: number;
+  work_hours_saved: number;
+  manual_triage_hours: number;
+  omega_triage_hours: number;
+  triage_hours_saved: number;
+  manual_cost_usd: number;
+  omega_cost_usd: number;
+  llm_cost_usd: number;
+  gross_savings_usd: number;
+  net_savings_usd: number;
+  bridge_engineers: number;
+  hourly_rate_usd: number;
+};
+
+export type CostSavingsSummary = {
+  incident_count: number;
+  totals: {
+    manual_work_hours: number;
+    omega_work_hours: number;
+    work_hours_saved: number;
+    manual_cost_usd: number;
+    omega_cost_usd: number;
+    llm_cost_usd: number;
+    gross_savings_usd: number;
+    net_savings_usd: number;
+    avg_mttr_saved_minutes?: number;
+  };
+  methodology?: string;
+};
+
+export type StackUsage = {
+  total_incidents: number;
+  langfuse_traced: number;
+  langfuse_scored: number;
+  clickhouse_stored: number;
+  json_stored: number;
+  openui_dashboard_ready: number;
+  human_resolved: number;
+  storage_backend: string;
+  clickhouse_enabled: boolean;
+  clickhouse_connected: boolean;
+  langfuse_human_scored?: number;
+  langfuse_golden?: number;
+  openui_twin_ready?: number;
+  per_incident: Array<{
+    incident_id: string;
+    service: string;
+    status: string;
+    langfuse_trace: string | null;
+    langfuse_scores_auto: number;
+    langfuse_scores_human: number;
+    langfuse_scores_total: number;
+    langfuse_human: string;
+    langfuse_golden: boolean;
+    langfuse_quality_pct: number;
+    clickhouse_backend: string;
+    clickhouse_indexed: string;
+    openui_tier: string;
+    openui_components: number;
+    openui_tokens_est: number;
+  }>;
+  cost_savings_totals: CostSavingsSummary["totals"];
+  without_stack: {
+    langfuse_off_traces: number;
+    no_clickhouse_query_ms: number;
+    openui_markdown_only_tokens_est: number;
+  };
+  with_stack: {
+    langfuse_traces: number;
+    clickhouse_query_ms: number | null;
+    openui_lang_tokens_est: number;
+    net_savings_usd: number;
+  };
 };
 
 export type Analytics = {
@@ -42,6 +163,20 @@ export type Analytics = {
   human_approval_rate: number;
   avg_root_cause_quality: number;
   by_service: Record<string, number>;
+  approval_trend?: Array<{ index: number; approval_rate: number; label: string }>;
+  prompt_version?: string;
+  cost_savings?: {
+    incident_count: number;
+    totals: CostSavingsSummary["totals"];
+  };
+  stack?: StackUsage;
+  storage?: {
+    backend: string;
+    clickhouse_enabled: boolean;
+    clickhouse_connected: boolean;
+    query_ms?: { clickhouse: number | null; json_file: number };
+    speedup_x?: number | null;
+  };
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -57,7 +192,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function getHealth() {
-  return request<{ status: string; langfuse: boolean; llm: boolean; demo_mode: boolean }>("/health");
+  return request<{
+    status: string;
+    langfuse: boolean;
+    llm: boolean;
+    demo_mode: boolean;
+    clickhouse: boolean;
+    clickhouse_enabled: boolean;
+    storage_backend: string;
+  }>("/health");
 }
 
 export async function listIncidents(limit = 20) {
@@ -88,6 +231,58 @@ export async function optimizePrompt(agent = "scientist") {
     method: "POST",
     body: JSON.stringify({ agent, min_failures: 3 }),
   });
+}
+
+export type PublicIncidentSummary = {
+  id: string;
+  company: string;
+  date: string;
+  title: string;
+  category: string;
+  severity: string;
+  mttr_minutes: number;
+  source_url: string;
+  source_label: string;
+  summary: string;
+  root_cause: string;
+  cost_savings?: CostSavingsRow;
+};
+
+export type PublicIncidentDetail = PublicIncidentSummary & {
+  resolution: string;
+  affected_services: string[];
+  timeline: Array<{ time: string; event: string }>;
+  omega_event: Incident["event"];
+  expected_omega_root_cause: string;
+  cost_savings?: CostSavingsRow;
+};
+
+export async function listPublicIncidents() {
+  return request<{
+    incidents: PublicIncidentSummary[];
+    source: string;
+    savings_summary: CostSavingsSummary;
+  }>("/public-incidents");
+}
+
+export async function getPublicIncident(id: string) {
+  return request<PublicIncidentDetail>(`/public-incidents/${id}`);
+}
+
+export async function replayPublicIncident(id: string) {
+  return request<{
+    public_incident: PublicIncidentDetail;
+    omega_incident: Incident;
+    omega_incident_id: string;
+    root_cause_match: boolean;
+    comparison: {
+      real_root_cause: string;
+      omega_root_cause: string | null;
+      real_resolution: string;
+      omega_action: string | null;
+      real_mttr_minutes: number;
+    };
+  }>(`/public-incidents/${id}/replay`, { method: "POST" });
 }
 
 export async function queryIncidents(query: string, limit = 10) {

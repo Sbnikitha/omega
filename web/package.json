@@ -3,17 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "generate:openui-prompt": "node scripts/generate-openui-prompt.mjs",
+    "dev": "npm run generate:openui-prompt && next dev",
+    "build": "npm run generate:openui-prompt && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@openuidev/lang-core": "^0.2.5",
+    "@openuidev/react-headless": "^0.8.2",
+    "@openuidev/react-lang": "^0.2.6",
+    "@openuidev/react-ui": "^0.11.8",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
+    "openai": "^6.42.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

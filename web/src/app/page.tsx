@@ -4,17 +4,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
+  BookOpen,
   CheckCircle2,
+  Info,
+  LayoutDashboard,
+  Sparkles,
   Radio,
   RefreshCw,
   Search,
-  Sparkles,
   Terminal,
   XCircle,
 } from "lucide-react";
+import { CostSavingsSummaryBar, OpsCostTicker } from "@/components/omega/CostSavingsPanel";
+import { GuideTab } from "@/components/omega/GuideTab";
+import { OpenUICopilot } from "@/components/omega/OpenUICopilot";
+import {
+  PublicIncidentLibrary,
+  PublicIncidentMinimalDetail,
+} from "@/components/omega/PublicIncidentLibrary";
 import { AgentPipeline, type AgentId } from "@/components/omega/AgentPipeline";
 import { AgentTerminal, type LogLine } from "@/components/omega/AgentTerminal";
+import { CascadeTimeline } from "@/components/omega/CascadeTimeline";
+import { ChangeLog } from "@/components/omega/ChangeLog";
+import { CodebaseChecklist } from "@/components/omega/CodebaseChecklist";
 import { DependencyMesh } from "@/components/omega/DependencyMesh";
+import { ImprovementChart } from "@/components/omega/ImprovementChart";
+import { IncidentTimeline } from "@/components/omega/IncidentTimeline";
+import { LangfuseScoresPanel } from "@/components/omega/LangfuseScoresPanel";
+import { RACIPanel } from "@/components/omega/RACIPanel";
+import { ScenarioComparisonTable } from "@/components/omega/ScenarioComparisonTable";
+import { SimulationStepper, SimulationStepperLive } from "@/components/omega/SimulationStepper";
 import {
   AGENT_ORDER,
   AMBIENT_LOGS,
@@ -24,11 +43,17 @@ import {
 import {
   Analytics,
   Incident,
+  PublicIncidentDetail,
+  PublicIncidentSummary,
+  CostSavingsSummary,
   createIncident,
   getHealth,
+  getPublicIncident,
   listIncidents,
+  listPublicIncidents,
   optimizePrompt,
   queryIncidents,
+  replayPublicIncident,
   submitFeedback,
 } from "@/lib/omega-api";
 
@@ -49,37 +74,22 @@ const SAMPLE_QUERIES = [
   "Which service has highest severity?",
 ];
 
-function ScoreBar({ label, value }: { label: string; value?: number }) {
-  const pct = Math.round((value ?? 0) * 100);
-  return (
-    <div className="space-y-1.5">
-      <div className="flex justify-between text-[10px] uppercase tracking-widest text-zinc-500">
-        <span>{label}</span>
-        <motion.span key={pct} initial={{ color: "#06b6d4" }} animate={{ color: "#a1a1aa" }}>
-          {pct}%
-        </motion.span>
-      </div>
-      <div className="h-2 rounded-full bg-zinc-900 overflow-hidden border border-zinc-800">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500"
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      </div>
-    </div>
-  );
-}
-
 function LiveClock() {
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState<string | null>(null);
   useEffect(() => {
     const tick = () => setTime(new Date().toISOString().replace("T", " ").slice(0, 19));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return <span className="font-mono text-[10px] text-cyan-500/80">{time} UTC</span>;
+  if (time === null) {
+    return <span className="font-mono text-[10px] text-cyan-500/50">--:--:-- UTC</span>;
+  }
+  return (
+    <span className="font-mono text-[10px] text-cyan-500/80" suppressHydrationWarning>
+      {time} UTC
+    </span>
+  );
 }
 
 export default function OmegaDashboard() {
@@ -88,7 +98,13 @@ export default function OmegaDashboard() {
   const [selected, setSelected] = useState<Incident | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
-  const [health, setHealth] = useState<{ langfuse: boolean; llm: boolean; demo_mode: boolean } | null>(null);
+  const [health, setHealth] = useState<{
+    langfuse: boolean;
+    llm: boolean;
+    demo_mode: boolean;
+    clickhouse: boolean;
+    storage_backend: string;
+  } | null>(null);
   const [nlQuery, setNlQuery] = useState("");
   const [nlResult, setNlResult] = useState("");
   const [optimizeMsg, setOptimizeMsg] = useState("");
@@ -100,7 +116,29 @@ export default function OmegaDashboard() {
   const [tokens, setTokens] = useState(0);
   const [latencyMs, setLatencyMs] = useState(0);
   const [pipelineRunning, setPipelineRunning] = useState(false);
+  const [simulationStep, setSimulationStep] = useState(-1);
+  const [mounted, setMounted] = useState(false);
+  const [viewMode, setViewMode] = useState<"library" | "ops" | "guide" | "copilot">("library");
+  const [publicIncidents, setPublicIncidents] = useState<PublicIncidentSummary[]>([]);
+  const [selectedPublicId, setSelectedPublicId] = useState<string | null>(null);
+  const [publicDetail, setPublicDetail] = useState<PublicIncidentDetail | null>(null);
+  const [publicComparison, setPublicComparison] = useState<{
+    root_cause_match: boolean;
+    comparison: {
+      real_root_cause: string;
+      omega_root_cause: string | null;
+      real_resolution: string;
+      omega_action: string | null;
+      real_mttr_minutes: number;
+    };
+  } | null>(null);
+  const [replaying, setReplaying] = useState(false);
+  const [publicSavings, setPublicSavings] = useState<CostSavingsSummary | null>(null);
   const logInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const pushLogs = useCallback((newLines: LogLine[]) => {
     setLogs((prev) => [...prev.slice(-120), ...newLines]);
@@ -130,11 +168,79 @@ export default function OmegaDashboard() {
     refresh();
   }, [refresh]);
 
-  // Ambient terminal chatter
   useEffect(() => {
+    (async () => {
+      try {
+        const data = await listPublicIncidents();
+        setPublicIncidents(data.incidents);
+        setPublicSavings(data.savings_summary);
+        setSelectedPublicId((prev) => prev ?? data.incidents[0]?.id ?? null);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to load public incidents");
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPublicId) {
+      setPublicDetail(null);
+      setPublicComparison(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const detail = await getPublicIncident(selectedPublicId);
+        if (!cancelled) {
+          setPublicDetail(detail);
+          setPublicComparison(null);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load incident");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPublicId]);
+
+  const handlePublicReplay = async () => {
+    if (!selectedPublicId) return;
+    setReplaying(true);
+    setError("");
+    try {
+      const result = await replayPublicIncident(selectedPublicId);
+      setPublicComparison({
+        root_cause_match: result.root_cause_match,
+        comparison: result.comparison,
+      });
+      setIncidents((prev) => [result.omega_incident, ...prev]);
+      setSelected(result.omega_incident);
+      setCompletedAgents(new Set(AGENT_ORDER));
+      setActiveAgent("human");
+      setViewMode("ops");
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Replay failed");
+    } finally {
+      setReplaying(false);
+    }
+  };
+
+  // Ambient terminal chatter — client-only (after mount) to avoid hydration drift
+  useEffect(() => {
+    if (!mounted) return;
     logInterval.current = setInterval(() => {
       const ambient = AMBIENT_LOGS[Math.floor(Math.random() * AMBIENT_LOGS.length)];
-      pushLogs([{ ...ambient, id: `${ambient.id}-${Date.now()}` }]);
+      pushLogs([
+        {
+          ...ambient,
+          id: `${ambient.id}-${Date.now()}`,
+          ts: new Date().toISOString().slice(11, 23),
+        },
+      ]);
       if (!pipelineRunning) {
         setTokens((t) => t + Math.floor(Math.random() * 40));
         setLatencyMs(180 + Math.floor(Math.random() * 120));
@@ -143,7 +249,7 @@ export default function OmegaDashboard() {
     return () => {
       if (logInterval.current) clearInterval(logInterval.current);
     };
-  }, [pipelineRunning, pushLogs]);
+  }, [mounted, pipelineRunning, pushLogs]);
 
   const animatePipeline = useCallback(async () => {
     setPipelineRunning(true);
@@ -164,6 +270,12 @@ export default function OmegaDashboard() {
 
     for (const agent of AGENT_ORDER) {
       setActiveAgent(agent);
+      if (agent === "simulator") {
+        for (let s = 0; s < 7; s++) {
+          setSimulationStep(s);
+          await delay(350);
+        }
+      }
       const script = PIPELINE_SCRIPT[agent];
       for (const logLine of script) {
         pushLogs([logLine]);
@@ -174,6 +286,7 @@ export default function OmegaDashboard() {
       setCompletedAgents((prev) => new Set([...prev, agent]));
       await delay(400);
     }
+    setSimulationStep(7);
 
     setActiveAgent("human");
     pushLogs([
@@ -313,24 +426,44 @@ export default function OmegaDashboard() {
   const approvalPct = Math.round((analytics?.human_approval_rate ?? 0) * 100);
   const hotNode = pipelineRunning || running ? "auth" : selected?.event.service;
 
-  return (
-    <main className="min-h-screen bg-[#030305] text-zinc-100 overflow-x-hidden">
-      {/* Animated grid background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
-        <motion.div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,rgba(6,182,212,0.12),transparent_50%)]"
-          animate={{ opacity: [0.5, 0.8, 0.5] }}
-          transition={{ repeat: Infinity, duration: 6 }}
-        />
-        <motion.div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_80%,rgba(139,92,246,0.1),transparent_50%)]"
-          animate={{ opacity: [0.4, 0.7, 0.4] }}
-          transition={{ repeat: Infinity, duration: 8, delay: 1 }}
-        />
-      </div>
+  const isLibrary = viewMode === "library";
+  const isGuide = viewMode === "guide";
+  const isCopilot = viewMode === "copilot";
+  const isMinimalChrome = isLibrary;
+  const isAnimatedChrome = isGuide || isCopilot || viewMode === "ops";
 
-      <header className="relative border-b border-cyan-500/10 bg-[#030305]/90 backdrop-blur-xl px-6 md:px-10 py-4">
+  return (
+    <main className={`min-h-screen overflow-x-hidden ${isMinimalChrome ? "bg-zinc-950 text-zinc-100" : "bg-[#030305] text-zinc-100"}`}>
+      {/* Animated grid background — ops mode only */}
+      {isAnimatedChrome && (
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:48px_48px]" />
+          {mounted && (
+            <>
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,rgba(6,182,212,0.12),transparent_50%)]"
+                initial={false}
+                animate={{ opacity: [0.5, 0.8, 0.5] }}
+                transition={{ repeat: Infinity, duration: 6 }}
+              />
+              <motion.div
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_80%,rgba(139,92,246,0.1),transparent_50%)]"
+                initial={false}
+                animate={{ opacity: [0.4, 0.7, 0.4] }}
+                transition={{ repeat: Infinity, duration: 8, delay: 1 }}
+              />
+            </>
+          )}
+        </div>
+      )}
+
+      <header
+        className={`relative backdrop-blur-xl px-6 md:px-10 py-4 ${
+          isMinimalChrome
+            ? "border-b border-zinc-800 bg-zinc-950/95"
+            : "border-b border-cyan-500/10 bg-[#030305]/90"
+        }`}
+      >
         <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-5">
             <a
@@ -343,14 +476,10 @@ export default function OmegaDashboard() {
             </a>
             <div>
               <div className="flex items-center gap-3">
-                <motion.h1
-                  className="text-2xl font-black tracking-tight"
-                  animate={{ textShadow: ["0 0 0px cyan", "0 0 20px rgba(6,182,212,0.4)", "0 0 0px cyan"] }}
-                  transition={{ repeat: Infinity, duration: 3 }}
-                >
+                <h1 className="text-2xl font-black tracking-tight">
                   OMEGA <span className="text-cyan-400">×</span>{" "}
                   <span className="text-violet-400">Langfuse</span>
-                </motion.h1>
+                </h1>
                 <span className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-red-500/30 bg-red-500/10">
                   <Radio className="w-3 h-3 text-red-400 animate-pulse" />
                   <span className="text-[9px] font-mono text-red-400 uppercase">Live</span>
@@ -363,6 +492,52 @@ export default function OmegaDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            <div className="flex rounded-lg border border-zinc-800 p-0.5 bg-zinc-900/50">
+              <button
+                type="button"
+                onClick={() => setViewMode("library")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  isLibrary ? "bg-zinc-100 text-zinc-900" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                Incidents
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("guide")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  isGuide
+                    ? "bg-violet-500/25 text-violet-200 border border-violet-500/40 shadow-[0_0_12px_rgba(139,92,246,0.35)]"
+                    : "text-zinc-500 hover:text-violet-300"
+                }`}
+              >
+                <Info className="w-3.5 h-3.5" />
+                Guide
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("copilot")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  isCopilot
+                    ? "bg-fuchsia-500/25 text-fuchsia-200 border border-fuchsia-500/40 shadow-[0_0_12px_rgba(217,70,239,0.35)]"
+                    : "text-zinc-500 hover:text-fuchsia-300"
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Copilot
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("ops")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  viewMode === "ops" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                Ops center
+              </button>
+            </div>
             <LiveClock />
             {health && (
               <div className="flex gap-2 text-[9px] font-mono uppercase tracking-wider">
@@ -371,6 +546,9 @@ export default function OmegaDashboard() {
                 </span>
                 <span className={`px-2 py-1 rounded border ${health.demo_mode ? "border-amber-500/40 text-amber-400" : "border-violet-500/40 text-violet-400"}`}>
                   {health.demo_mode ? "DEMO" : "PROD"}
+                </span>
+                <span className={`px-2 py-1 rounded border ${health.clickhouse ? "border-amber-500/40 text-amber-400 bg-amber-500/5" : "border-zinc-800 text-zinc-600"}`}>
+                  CH:{health.clickhouse ? "ON" : health.storage_backend === "json_file" ? "JSON" : "OFF"}
                 </span>
               </div>
             )}
@@ -386,8 +564,49 @@ export default function OmegaDashboard() {
       </header>
 
       <div className="relative max-w-[1600px] mx-auto px-6 md:px-10 py-6 space-y-5">
+        {isCopilot ? (
+          <OpenUICopilot />
+        ) : isGuide ? (
+          <GuideTab analytics={analytics} clickhouseConnected={health?.clickhouse} />
+        ) : isLibrary ? (
+          <div className="space-y-4">
+            {error && (
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>
+            )}
+            {publicSavings && <CostSavingsSummaryBar summary={publicSavings} />}
+            <div className="grid lg:grid-cols-12 gap-5">
+              <div className="lg:col-span-4">
+                <PublicIncidentLibrary
+                  incidents={publicIncidents}
+                  selectedId={selectedPublicId ?? undefined}
+                  onSelect={setSelectedPublicId}
+                />
+              </div>
+              <div className="lg:col-span-8">
+                {publicDetail ? (
+                  <PublicIncidentMinimalDetail
+                    incident={publicDetail}
+                    onReplay={handlePublicReplay}
+                    replaying={replaying}
+                    comparison={publicComparison}
+                  />
+                ) : (
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-16 text-center text-zinc-500 text-sm">
+                    Select an incident to view the published report
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* Top metrics ticker */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+          <OpsCostTicker
+            workHoursSaved={analytics?.cost_savings?.totals.work_hours_saved ?? 0}
+            netSavingsUsd={analytics?.cost_savings?.totals.net_savings_usd ?? 0}
+            llmCostUsd={analytics?.cost_savings?.totals.llm_cost_usd ?? 0}
+          />
           {[
             { label: "Human Approval", value: `${approvalPct}%`, accent: "text-cyan-400" },
             { label: "Incidents", value: String(analytics?.total ?? 0), accent: "text-white" },
@@ -401,9 +620,7 @@ export default function OmegaDashboard() {
               whileHover={{ borderColor: "rgba(6,182,212,0.3)" }}
             >
               <p className="text-[9px] uppercase tracking-widest text-zinc-600">{m.label}</p>
-              <motion.p key={m.value} className={`text-2xl font-black font-mono ${m.accent}`} initial={{ y: 4, opacity: 0.5 }} animate={{ y: 0, opacity: 1 }}>
-                {m.value}
-              </motion.p>
+              <p className={`text-2xl font-black font-mono ${m.accent}`}>{m.value}</p>
             </motion.div>
           ))}
         </div>
@@ -420,7 +637,9 @@ export default function OmegaDashboard() {
         <div className="grid lg:grid-cols-12 gap-5">
           {/* Left column */}
           <div className="lg:col-span-4 space-y-4">
-            <DependencyMesh hotNode={hotNode} cascadeNodes={pipelineRunning ? CASCADE : selected?.root_cause?.affected_services || []} />
+            <ImprovementChart analytics={analytics} />
+            <DependencyMesh hotNode={hotNode} cascadeNodes={pipelineRunning ? CASCADE : selected?.simulation?.cascade?.order || selected?.root_cause?.affected_services || []} />
+            <CodebaseChecklist completedThrough={selected?.status === "approved" || selected?.status === "rejected" ? 10 : selected ? 7 : 3} />
 
             <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/50 p-4 space-y-3">
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 flex items-center gap-2">
@@ -596,38 +815,31 @@ export default function OmegaDashboard() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950/50 p-5">
-                    <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-4">LLM-as-Judge · Langfuse Auto-Eval</p>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <ScoreBar label="Root Cause Quality" value={selected.auto_scores?.root_cause_quality} />
-                      <ScoreBar label="Scenario Realism" value={selected.auto_scores?.scenario_realism} />
-                      <ScoreBar label="Action Safety" value={selected.auto_scores?.action_safety} />
-                    </div>
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    <IncidentTimeline timeline={selected.timeline} incidentId={selected.incident_id} />
+                    <RACIPanel incident={selected} />
                   </div>
 
-                  {selected.scenarios?.scenarios && (
-                    <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950/50 p-5">
-                      <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-4">Digital Twin · Simulator Output</p>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        {selected.scenarios.scenarios.map((s) => (
-                          <motion.div
-                            key={s.id}
-                            className={`rounded-xl border p-4 font-mono text-xs ${
-                              s.id === selected.scenarios?.recommended_scenario_id
-                                ? "border-cyan-500/40 bg-cyan-500/5 shadow-[0_0_20px_rgba(6,182,212,0.1)]"
-                                : "border-zinc-800"
-                            }`}
-                            whileHover={{ scale: 1.01 }}
-                          >
-                            <div className="flex justify-between mb-2">
-                              <span className="font-bold text-zinc-200">{s.action}</span>
-                              <span className="text-amber-500">risk:{Math.round(s.risk_score * 100)}%</span>
-                            </div>
-                            <p className="text-zinc-500">{s.predicted_impact}</p>
-                          </motion.div>
-                        ))}
-                      </div>
+                  {pipelineRunning && simulationStep >= 0 && simulationStep < 7 && (
+                    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+                      <p className="text-[9px] uppercase text-amber-400 mb-2">Live simulation progress</p>
+                      <SimulationStepperLive activeStep={simulationStep} />
                     </div>
+                  )}
+
+                  <SimulationStepper simulation={selected.simulation} />
+                  <CascadeTimeline simulation={selected.simulation} />
+                  <ScenarioComparisonTable incident={selected} />
+
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    <LangfuseScoresPanel scores={selected.langfuse_scores ?? selected.auto_scores} />
+                    <ChangeLog entries={selected.change_log} />
+                  </div>
+
+                  {selected.prompt_version && (
+                    <p className="text-[9px] font-mono text-violet-400/80 text-center">
+                      Langfuse prompt: {selected.prompt_version}
+                    </p>
                   )}
                 </motion.div>
               ) : (
@@ -644,6 +856,8 @@ export default function OmegaDashboard() {
             </AnimatePresence>
           </div>
         </div>
+          </>
+        )}
       </div>
     </main>
   );

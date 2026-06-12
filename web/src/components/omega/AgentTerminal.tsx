@@ -54,9 +54,7 @@ export function AgentTerminal({
           {lines.map((line) => (
             <motion.div
               key={line.id}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.15 }}
+              initial={false}
               className="flex gap-2 py-0.5 hover:bg-emerald-500/5"
             >
               <span className="text-zinc-600 shrink-0">{line.ts}</span>

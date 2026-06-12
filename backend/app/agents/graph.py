@@ -18,6 +18,7 @@ from app.models import (
     ScenarioPlan,
     Severity,
 )
+from app.services.incident_tracker import build_simulation, build_timeline, log_change, merge_langfuse_scores
 from app.services.llm import flush_langfuse, invoke_structured
 from app.services.prompt_manager import get_prompt
 
@@ -56,6 +57,8 @@ def observer_node(state: GraphState) -> GraphState:
     )
     incident.classified = classified
     incident.status = "classified"
+    log_change(incident, "Observer", "status", "classified", "Event classified", "pending")
+    log_change(incident, "Observer", "severity_label", classified.severity_label.value, classified.event_type)
     lf = get_langfuse()
     if lf:
         obs = lf.get_current_observation_id()
@@ -84,6 +87,13 @@ def scientist_node(state: GraphState) -> GraphState:
         reasoning=result.get("reasoning", ""),
     )
     incident.status = "analyzed"
+    log_change(
+        incident,
+        "Scientist",
+        "root_cause",
+        incident.root_cause.root_cause,
+        f"confidence={incident.root_cause.confidence:.0%}",
+    )
     lf = get_langfuse()
     if lf:
         obs = lf.get_current_observation_id()
@@ -112,6 +122,14 @@ def simulator_node(state: GraphState) -> GraphState:
         risk_score=float(result.get("risk_score", 0.5)),
     )
     incident.status = "simulated"
+    incident.simulation = build_simulation(incident)
+    log_change(
+        incident,
+        "Simulator",
+        "recommended_scenario",
+        incident.scenarios.recommended_scenario_id,
+        f"risk={incident.scenarios.risk_score:.0%}",
+    )
     lf = get_langfuse()
     if lf:
         obs = lf.get_current_observation_id()
@@ -149,6 +167,14 @@ def response_node(state: GraphState) -> GraphState:
         rationale=result.get("rationale", ""),
     )
     incident.status = "awaiting_approval" if requires_approval else "auto_ready"
+    log_change(
+        incident,
+        "Response",
+        "recommended_action",
+        incident.action_plan.recommended_action_id,
+        incident.action_plan.rationale,
+    )
+    incident.timeline = build_timeline(incident)
     lf = get_langfuse()
     if lf:
         obs = lf.get_current_observation_id()
@@ -186,6 +212,11 @@ def run_incident_pipeline(event: IncidentEvent) -> IncidentState:
         result = graph.invoke({"incident": incident})
         incident = result["incident"]
         incident.auto_scores = evaluate_incident(incident)
+        merge_langfuse_scores(incident)
+        if not incident.simulation:
+            incident.simulation = build_simulation(incident)
+        if not incident.timeline:
+            incident.timeline = build_timeline(incident)
         flush_langfuse()
 
     return incident

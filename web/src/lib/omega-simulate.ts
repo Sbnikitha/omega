@@ -3,12 +3,8 @@ import type { LogLine } from "@/components/omega/AgentTerminal";
 
 let logCounter = 0;
 
-function ts() {
-  return new Date().toISOString().slice(11, 23);
-}
-
-function line(agent: string, level: LogLine["level"], msg: string): LogLine {
-  return { id: `log-${++logCounter}`, ts: ts(), agent, level, msg };
+function line(agent: string, level: LogLine["level"], msg: string, ts = "00:00:00.000"): LogLine {
+  return { id: `log-${++logCounter}`, ts, agent, level, msg };
 }
 
 export const PIPELINE_SCRIPT: Record<Exclude<AgentId, "idle" | "human">, LogLine[]> = {
@@ -46,12 +42,17 @@ export const PIPELINE_SCRIPT: Record<Exclude<AgentId, "idle" | "human">, LogLine
   ],
 };
 
+/** Static seed logs — no Date.now() so SSR and client hydrate identically */
 export const AMBIENT_LOGS: LogLine[] = [
-  line("langfuse", "LANGFUSE", "otel.exporter batch flush :: 12 observations queued"),
-  line("redis", "DEBUG", "XREADGROUP omega-scientist block=5000 streams=crisis_detected"),
-  line("omega", "SYS", "heartbeat :: agents=4 uptime=99.97% incidents_processed=51"),
-  line("judge", "LLM", "llm-as-judge evaluator idle :: root_cause_quality threshold=0.80"),
+  line("langfuse", "LANGFUSE", "otel.exporter batch flush :: 12 observations queued", "00:00:01.000"),
+  line("redis", "DEBUG", "XREADGROUP omega-scientist block=5000 streams=crisis_detected", "00:00:02.000"),
+  line("omega", "SYS", "heartbeat :: agents=4 uptime=99.97% incidents_processed=51", "00:00:03.000"),
+  line("judge", "LLM", "llm-as-judge evaluator idle :: root_cause_quality threshold=0.80", "00:00:04.000"),
 ];
+
+export function freshTimestamp(): string {
+  return new Date().toISOString().slice(11, 23);
+}
 
 export const AGENT_ORDER: Exclude<AgentId, "idle" | "human">[] = [
   "observer",

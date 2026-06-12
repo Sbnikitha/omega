@@ -47,15 +47,11 @@ export function AgentPipeline({
         <div className="flex gap-4 font-mono text-[10px]">
           <div className="text-center">
             <p className="text-zinc-600">TOKENS</p>
-            <motion.p key={tokens} initial={{ scale: 1.2, color: "#06b6d4" }} animate={{ scale: 1, color: "#e4e4e7" }} className="font-bold">
-              {tokens.toLocaleString()}
-            </motion.p>
+            <p className="font-bold text-zinc-200">{tokens.toLocaleString()}</p>
           </div>
           <div className="text-center">
             <p className="text-zinc-600">LATENCY</p>
-            <motion.p key={latencyMs} initial={{ scale: 1.2, color: "#8b5cf6" }} animate={{ scale: 1, color: "#e4e4e7" }} className="font-bold">
-              {latencyMs}ms
-            </motion.p>
+            <p className="font-bold text-zinc-200">{latencyMs}ms</p>
           </div>
         </div>
       </div>
@@ -68,6 +64,7 @@ export function AgentPipeline({
             <div key={agent.id} className="flex items-center flex-1 min-w-0">
               <motion.div
                 className="relative flex-1 rounded-xl border p-4 text-center min-w-0"
+                initial={false}
                 animate={{
                   borderColor: state === "active" ? agent.color : state === "done" ? `${agent.color}66` : "#27272a",
                   boxShadow: state === "active" ? `0 0 30px ${agent.color}40` : "0 0 0px transparent",

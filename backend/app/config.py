@@ -21,6 +21,22 @@ class Settings(BaseSettings):
     golden_dataset_name: str = "omega-incidents-golden-v1"
     confidence_threshold: float = 0.85
 
+    # Cost / manual work savings model (USD, minutes)
+    omega_engineer_hourly_usd: float = 150.0
+    omega_bridge_engineers: int = 3
+    omega_llm_cost_per_incident: float = 0.024
+    omega_pipeline_minutes: float = 4.0
+    omega_diagnosis_reduction_pct: float = 0.45
+    omega_diagnosis_reduction_cap_min: float = 90.0
+
+    # ClickHouse columnar incident store (set OMEGA_CLICKHOUSE_ENABLED=true)
+    clickhouse_enabled: bool = False
+    clickhouse_host: str = "localhost"
+    clickhouse_port: int = 8123
+    clickhouse_user: str = "default"
+    clickhouse_password: str = ""
+    clickhouse_database: str = "default"
+
     @property
     def langfuse_enabled(self) -> bool:
         return bool(self.langfuse_public_key and self.langfuse_secret_key)

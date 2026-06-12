@@ -1,0 +1,259 @@
+[
+  {
+    "id": "github-2024-08-db-routing",
+    "company": "GitHub",
+    "date": "2024-08-14",
+    "title": "Database routing misconfiguration",
+    "category": "config_error",
+    "severity": "critical",
+    "mttr_minutes": 36,
+    "source_url": "https://github.blog/news-insights/company-news/github-availability-report-august-2024/",
+    "source_label": "GitHub Availability Report",
+    "summary": "A configuration change to GitHub.com databases broke routing-service health checks. The production read-only endpoint was marked unhealthy, causing read failures site-wide.",
+    "root_cause": "Config change broke health-check routing to read replicas",
+    "resolution": "Reverted the configuration change",
+    "affected_services": ["github.com", "api", "git operations"],
+    "timeline": [
+      { "time": "T+0m", "event": "Read operations begin failing on GitHub.com" },
+      { "time": "T+12m", "event": "Engineers identify unhealthy read-only DB endpoint" },
+      { "time": "T+36m", "event": "Configuration reverted; reads restored" }
+    ],
+    "omega_event": {
+      "type": "deploy_failure",
+      "service": "database",
+      "severity": 0.93,
+      "metrics": { "error_rate": 0.45, "p99_ms": 3200 },
+      "dependency_graph": {
+        "frontend": ["api-gateway"],
+        "api-gateway": ["database"],
+        "database": []
+      }
+    },
+    "expected_omega_root_cause": "bad_deploy"
+  },
+  {
+    "id": "aws-s3-2017-us-east-1",
+    "company": "AWS",
+    "date": "2017-02-28",
+    "title": "S3 US-EAST-1 widespread outage",
+    "category": "operator_error",
+    "severity": "critical",
+    "mttr_minutes": 240,
+    "source_url": "https://aws.amazon.com/message/41926/",
+    "source_label": "AWS Post-Event Summary",
+    "summary": "An authorized S3 subsystem command was executed incorrectly, removing more server capacity than intended. Cascading failures affected many AWS services in us-east-1.",
+    "root_cause": "Typo in maintenance command removed excess S3 capacity",
+    "resolution": "Manual capacity recovery; subsystem restart",
+    "affected_services": ["S3", "EC2", "EBS", "Lambda", "new instance launches"],
+    "timeline": [
+      { "time": "T+0m", "event": "S3 error rates spike in us-east-1" },
+      { "time": "T+30m", "event": "Dependent services degrade (EC2, EBS)" },
+      { "time": "T+240m", "event": "Full recovery after capacity restored" }
+    ],
+    "omega_event": {
+      "type": "error_rate",
+      "service": "storage",
+      "severity": 0.98,
+      "metrics": { "error_rate": 0.55, "p99_ms": 5000 },
+      "dependency_graph": {
+        "ec2": ["storage"],
+        "lambda": ["storage"],
+        "ebs": ["storage"],
+        "storage": []
+      }
+    },
+    "expected_omega_root_cause": "connection_pool_exhaustion"
+  },
+  {
+    "id": "openai-chatgpt-outage-2024",
+    "company": "OpenAI",
+    "date": "2024-06-10",
+    "title": "ChatGPT elevated errors and latency",
+    "category": "capacity",
+    "severity": "high",
+    "mttr_minutes": 90,
+    "source_url": "https://status.openai.com/history",
+    "source_label": "OpenAI Status Page",
+    "summary": "Elevated error rates and latency across ChatGPT and API due to upstream dependency degradation during peak load.",
+    "root_cause": "Database dependency degradation under peak traffic",
+    "resolution": "Mitigation of dependency bottleneck; capacity scaling",
+    "affected_services": ["ChatGPT", "API", "DALL·E"],
+    "timeline": [
+      { "time": "T+0m", "event": "Elevated 5xx on API and ChatGPT" },
+      { "time": "T+20m", "event": "Identified database layer bottleneck" },
+      { "time": "T+90m", "event": "Error rates return to baseline" }
+    ],
+    "omega_event": {
+      "type": "database_timeout",
+      "service": "database",
+      "severity": 0.85,
+      "metrics": { "error_rate": 0.18, "p99_ms": 2100 },
+      "dependency_graph": {
+        "chatgpt": ["api-gateway"],
+        "api-gateway": ["database", "inference"],
+        "database": []
+      }
+    },
+    "expected_omega_root_cause": "database_timeout"
+  },
+  {
+    "id": "cloudflare-2022-bgp",
+    "company": "Cloudflare",
+    "date": "2022-06-21",
+    "title": "BGP route leak impact",
+    "category": "network",
+    "severity": "critical",
+    "mttr_minutes": 120,
+    "source_url": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+    "source_label": "Cloudflare Blog",
+    "summary": "A BGP route leak caused traffic disruption globally. Configuration changes during maintenance triggered unintended route propagation.",
+    "root_cause": "BGP route leak from configuration change",
+    "resolution": "Route withdrawal and config rollback",
+    "affected_services": ["CDN", "Workers", "DNS", "Access"],
+    "timeline": [
+      { "time": "T+0m", "event": "Global traffic anomalies detected" },
+      { "time": "T+45m", "event": "BGP leak identified" },
+      { "time": "T+120m", "event": "Routes stabilized" }
+    ],
+    "omega_event": {
+      "type": "latency_spike",
+      "service": "edge-routing",
+      "severity": 0.95,
+      "metrics": { "error_rate": 0.22, "p99_ms": 4500 },
+      "dependency_graph": {
+        "cdn": ["edge-routing"],
+        "workers": ["edge-routing"],
+        "edge-routing": []
+      }
+    },
+    "expected_omega_root_cause": "bad_deploy"
+  },
+  {
+    "id": "github-2016-power",
+    "company": "GitHub",
+    "date": "2016-01-28",
+    "title": "Primary datacenter power disruption",
+    "category": "infrastructure",
+    "severity": "critical",
+    "mttr_minutes": 60,
+    "source_url": "https://github.blog/2016-01-28-january-28th-incident-report/",
+    "source_label": "GitHub Incident Report",
+    "summary": "Power disruption at primary datacenter caused service impact. Failover procedures engaged to restore availability.",
+    "root_cause": "Datacenter power failure",
+    "resolution": "Failover to secondary infrastructure",
+    "affected_services": ["github.com", "git", "api"],
+    "timeline": [
+      { "time": "T+0m", "event": "Power loss at primary facility" },
+      { "time": "T+25m", "event": "Failover initiated" },
+      { "time": "T+60m", "event": "Core services restored" }
+    ],
+    "omega_event": {
+      "type": "error_rate",
+      "service": "api-gateway",
+      "severity": 0.9,
+      "metrics": { "error_rate": 0.35, "p99_ms": 8000 },
+      "dependency_graph": {
+        "frontend": ["api-gateway"],
+        "api-gateway": ["auth"],
+        "auth": []
+      }
+    },
+    "expected_omega_root_cause": "connection_pool_exhaustion"
+  },
+  {
+    "id": "google-gmail-2009",
+    "company": "Google",
+    "date": "2009-02-24",
+    "title": "Gmail multi-hour outage",
+    "category": "config_error",
+    "severity": "critical",
+    "mttr_minutes": 150,
+    "source_url": "https://googleblog.blogspot.com/2009/02/gmail-update.html",
+    "source_label": "Google Blog",
+    "summary": "Router configuration change caused traffic to be routed incorrectly, making Gmail unavailable for millions of users.",
+    "root_cause": "Router misconfiguration during maintenance",
+    "resolution": "Router config rollback",
+    "affected_services": ["Gmail", "Gmail API"],
+    "timeline": [
+      { "time": "T+0m", "event": "Gmail unreachable for users" },
+      { "time": "T+60m", "event": "Root cause traced to router config" },
+      { "time": "T+150m", "event": "Service fully restored" }
+    ],
+    "omega_event": {
+      "type": "deploy_failure",
+      "service": "network-router",
+      "severity": 0.92,
+      "metrics": { "error_rate": 1.0, "p99_ms": 0 },
+      "dependency_graph": {
+        "gmail-frontend": ["mail-backend"],
+        "mail-backend": ["network-router"],
+        "network-router": []
+      }
+    },
+    "expected_omega_root_cause": "bad_deploy"
+  },
+  {
+    "id": "stripe-api-latency-2019",
+    "company": "Stripe",
+    "date": "2019-07-16",
+    "title": "API latency and elevated errors",
+    "category": "database",
+    "severity": "high",
+    "mttr_minutes": 75,
+    "source_url": "https://status.stripe.com/",
+    "source_label": "Stripe Status",
+    "summary": "Elevated API latency and error rates due to database performance degradation affecting payment processing.",
+    "root_cause": "Database performance degradation under load",
+    "resolution": "Query optimization and capacity scaling",
+    "affected_services": ["Payments API", "Checkout", "Webhooks"],
+    "timeline": [
+      { "time": "T+0m", "event": "API p99 latency exceeds SLO" },
+      { "time": "T+30m", "event": "Database hot shard identified" },
+      { "time": "T+75m", "event": "Latency normalized" }
+    ],
+    "omega_event": {
+      "type": "database_timeout",
+      "service": "payments-db",
+      "severity": 0.82,
+      "metrics": { "error_rate": 0.08, "p99_ms": 3500 },
+      "dependency_graph": {
+        "checkout": ["payments-api"],
+        "payments-api": ["payments-db"],
+        "payments-db": []
+      }
+    },
+    "expected_omega_root_cause": "database_timeout"
+  },
+  {
+    "id": "slack-2020-outage",
+    "company": "Slack",
+    "date": "2020-05-07",
+    "title": "Global service disruption",
+    "category": "cascade",
+    "severity": "critical",
+    "mttr_minutes": 180,
+    "source_url": "https://slack.engineering/slacks-incident-on-may-7th-2020-cea4bf93a3f6",
+    "source_label": "Slack Engineering",
+    "summary": "Cascading failure from resource exhaustion in a core subsystem led to widespread message delivery failures.",
+    "root_cause": "Resource exhaustion in message delivery subsystem",
+    "resolution": "Subsystem restart and rate limiting adjustments",
+    "affected_services": ["Messaging", "Channels", "Search", "Apps"],
+    "timeline": [
+      { "time": "T+0m", "event": "Message send failures spike globally" },
+      { "time": "T+60m", "event": "Resource exhaustion in queue workers confirmed" },
+      { "time": "T+180m", "event": "Full message delivery restored" }
+    ],
+    "omega_event": {
+      "type": "connection_pool_exhaustion",
+      "service": "message-queue",
+      "severity": 0.88,
+      "metrics": { "error_rate": 0.25, "p99_ms": 6000 },
+      "dependency_graph": {
+        "clients": ["api"],
+        "api": ["message-queue"],
+        "message-queue": ["database"]
+      }
+    },
+    "expected_omega_root_cause": "connection_pool_exhaustion"
+  }
+]

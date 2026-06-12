@@ -9,8 +9,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.agents.graph import run_incident_pipeline
 from app.config import get_settings
 from app.models import HumanFeedbackRequest, IncidentEvent, NLQueryRequest, OptimizePromptRequest
+from app.services.clickhouse import clickhouse_is_active
 from app.services.incidents import store
 from app.services.prompt_optimizer import optimize_prompt
+from app.services.public_incidents import (
+    get_public_incident,
+    list_public_incidents,
+    public_incidents_savings_summary,
+    replay_public_incident,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("omega")
@@ -20,10 +27,11 @@ logger = logging.getLogger("omega")
 async def lifespan(app: FastAPI):
     settings = get_settings()
     logger.info(
-        "OMEGA starting | langfuse=%s | llm=%s | demo=%s",
+        "OMEGA starting | langfuse=%s | llm=%s | demo=%s | clickhouse=%s",
         settings.langfuse_enabled,
         settings.llm_enabled,
         settings.omega_demo_mode,
+        clickhouse_is_active(),
     )
     yield
 
@@ -37,8 +45,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -52,6 +65,9 @@ def health():
         "langfuse": settings.langfuse_enabled,
         "llm": settings.llm_enabled,
         "demo_mode": settings.omega_demo_mode,
+        "clickhouse": clickhouse_is_active(),
+        "clickhouse_enabled": settings.clickhouse_enabled,
+        "storage_backend": store.storage_backend(),
     }
 
 
@@ -96,3 +112,28 @@ def natural_language_query(request: NLQueryRequest):
 @app.get("/analytics")
 def analytics():
     return store.analytics()
+
+
+@app.get("/public-incidents")
+def public_incidents_list():
+    return {
+        "incidents": list_public_incidents(),
+        "source": "curated from public postmortems & status pages",
+        "savings_summary": public_incidents_savings_summary(),
+    }
+
+
+@app.get("/public-incidents/{incident_id}")
+def public_incident_detail(incident_id: str):
+    item = get_public_incident(incident_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Public incident not found")
+    return item
+
+
+@app.post("/public-incidents/{incident_id}/replay")
+def public_incident_replay(incident_id: str):
+    try:
+        return replay_public_incident(incident_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e

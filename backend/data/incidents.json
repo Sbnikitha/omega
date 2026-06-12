@@ -6328,5 +6328,569 @@
     "span_ids": {},
     "created_at": "2026-06-12T18:39:55.333390",
     "resolved_at": null
+  },
+  {
+    "incident_id": "b0d2078d-824d-4372-bb6a-f6da98fbb87e",
+    "trace_id": "b0d2078d-824d-4372-bb6a-f6da98fbb87e",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.87,
+      "timestamp": "2026-06-12T20:00:31.756053",
+      "metrics": {
+        "error_rate": 0.12
+      },
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth"
+        ],
+        "auth": [
+          "database"
+        ],
+        "database": []
+      }
+    },
+    "classified": {
+      "event_id": "b0d2078d-824d-4372-bb6a-f6da98fbb87e",
+      "event_type": "connection_pool_exhaustion",
+      "service": "auth",
+      "severity": 0.87,
+      "severity_label": "HIGH",
+      "classified_at": "2026-06-12T20:00:31.756053",
+      "dependency_graph": {
+        "frontend": [
+          "api-gateway"
+        ],
+        "api-gateway": [
+          "auth"
+        ],
+        "auth": [
+          "database"
+        ],
+        "database": []
+      },
+      "metrics": {
+        "error_rate": 0.12
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "awaiting_approval",
+    "human_approved": null,
+    "human_feedback_reason": null,
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "langfuse_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "simulation": {
+      "simulation_id": "94e4d911-96e6-4bff-abec-91f62ef414e8",
+      "steps": [
+        {
+          "step_id": "TWIN_BOOT",
+          "name": "Boot Digital Twin",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763612",
+          "detail": "simulation engine online :: incident=b0d2078d"
+        },
+        {
+          "step_id": "TOPOLOGY_LOADED",
+          "name": "Load Topology",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763650",
+          "detail": "nodes=4 edges=3"
+        },
+        {
+          "step_id": "FAULT_INJECTED",
+          "name": "Inject Fault",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763665",
+          "detail": "fault@auth type=connection_pool_exhaustion"
+        },
+        {
+          "step_id": "CASCADE_SIMULATED",
+          "name": "Propagate Cascade",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763674",
+          "detail": "blast_radius=0.75 path=auth \u2192 api-gateway \u2192 frontend"
+        },
+        {
+          "step_id": "SCENARIOS_GENERATED",
+          "name": "Generate Scenarios",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763680",
+          "detail": "generated 2 intervention scenarios"
+        },
+        {
+          "step_id": "SCENARIOS_RANKED",
+          "name": "Score & Rank",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763686",
+          "detail": "ranked by risk_score :: winner=scale-pool"
+        },
+        {
+          "step_id": "RECOMMENDATION_READY",
+          "name": "Emit Recommendation",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:00:31.763693",
+          "detail": "aggregate_risk=0.2 human_gate=True"
+        }
+      ],
+      "steps_completed": [
+        "TWIN_BOOT",
+        "TOPOLOGY_LOADED",
+        "FAULT_INJECTED",
+        "CASCADE_SIMULATED",
+        "SCENARIOS_GENERATED",
+        "SCENARIOS_RANKED",
+        "RECOMMENDATION_READY"
+      ],
+      "fault_injection": {
+        "node": "auth",
+        "type": "connection_pool_exhaustion",
+        "injected_at": "2026-06-12T20:00:31.763717"
+      },
+      "cascade": {
+        "order": [
+          "auth",
+          "api-gateway",
+          "frontend"
+        ],
+        "blast_radius_score": 0.75,
+        "affected_count": 3
+      },
+      "aggregate_risk_score": 0.2,
+      "requires_human_approval": true
+    },
+    "timeline": [
+      {
+        "state": "NEW",
+        "owner": "System",
+        "timestamp": "2026-06-12T20:00:31.756212",
+        "status": "done"
+      },
+      {
+        "state": "CLASSIFIED",
+        "owner": "Observer",
+        "timestamp": "2026-06-12T20:00:31.764623",
+        "status": "done"
+      },
+      {
+        "state": "ANALYZING",
+        "owner": "Scientist",
+        "timestamp": "2026-06-12T20:00:31.764626",
+        "status": "done"
+      },
+      {
+        "state": "SIMULATING",
+        "owner": "Simulator",
+        "timestamp": "2026-06-12T20:00:31.764628",
+        "status": "done"
+      },
+      {
+        "state": "AWAITING_APPROVAL",
+        "owner": "Incident Commander",
+        "timestamp": "2026-06-12T20:00:31.764630",
+        "status": "active"
+      },
+      {
+        "state": "RESOLVED",
+        "owner": "Incident Commander",
+        "timestamp": "2026-06-12T20:00:31.764632",
+        "status": "pending"
+      }
+    ],
+    "change_log": [
+      {
+        "timestamp": "2026-06-12T20:00:31.762455",
+        "actor": "Observer",
+        "field": "status",
+        "old_value": "pending",
+        "new_value": "classified",
+        "detail": "Event classified"
+      },
+      {
+        "timestamp": "2026-06-12T20:00:31.762461",
+        "actor": "Observer",
+        "field": "severity_label",
+        "old_value": null,
+        "new_value": "HIGH",
+        "detail": "connection_pool_exhaustion"
+      },
+      {
+        "timestamp": "2026-06-12T20:00:31.762776",
+        "actor": "Scientist",
+        "field": "root_cause",
+        "old_value": null,
+        "new_value": "connection_pool_exhaustion",
+        "detail": "confidence=91%"
+      },
+      {
+        "timestamp": "2026-06-12T20:00:31.763738",
+        "actor": "Simulator",
+        "field": "recommended_scenario",
+        "old_value": null,
+        "new_value": "scale-pool",
+        "detail": "risk=20%"
+      },
+      {
+        "timestamp": "2026-06-12T20:00:31.764607",
+        "actor": "Response",
+        "field": "recommended_action",
+        "old_value": null,
+        "new_value": "scale",
+        "detail": "High severity requires human approval before pool scaling."
+      }
+    ],
+    "prompt_version": "scientist-root-cause@production",
+    "incident_commander": "on-call-engineer",
+    "created_at": "2026-06-12T20:00:31.756212",
+    "resolved_at": null
+  },
+  {
+    "incident_id": "ac50d834-29ad-46ed-8914-9d033c910fb9",
+    "trace_id": "ac50d834-29ad-46ed-8914-9d033c910fb9",
+    "event": {
+      "type": "connection_pool_exhaustion",
+      "service": "message-queue",
+      "severity": 0.88,
+      "timestamp": "2026-06-12T20:11:56.890924",
+      "metrics": {
+        "error_rate": 0.25,
+        "p99_ms": 6000
+      },
+      "dependency_graph": {
+        "clients": [
+          "api"
+        ],
+        "api": [
+          "message-queue"
+        ],
+        "message-queue": [
+          "database"
+        ]
+      }
+    },
+    "classified": {
+      "event_id": "ac50d834-29ad-46ed-8914-9d033c910fb9",
+      "event_type": "connection_pool_exhaustion",
+      "service": "message-queue",
+      "severity": 0.88,
+      "severity_label": "HIGH",
+      "classified_at": "2026-06-12T20:11:56.890924",
+      "dependency_graph": {
+        "clients": [
+          "api"
+        ],
+        "api": [
+          "message-queue"
+        ],
+        "message-queue": [
+          "database"
+        ]
+      },
+      "metrics": {
+        "error_rate": 0.25,
+        "p99_ms": 6000
+      }
+    },
+    "root_cause": {
+      "root_cause": "connection_pool_exhaustion",
+      "confidence": 0.91,
+      "affected_services": [
+        "auth",
+        "api-gateway",
+        "frontend"
+      ],
+      "reasoning": "Connection pool saturation propagated upstream via dependency graph."
+    },
+    "scenarios": {
+      "scenarios": [
+        {
+          "id": "scale-pool",
+          "action": "Scale connection pool + drain stale connections",
+          "predicted_impact": "Latency -40%, error rate -60%",
+          "risk_score": 0.2
+        },
+        {
+          "id": "rollback",
+          "action": "Rollback last deploy",
+          "predicted_impact": "Restores baseline, 5min downtime",
+          "risk_score": 0.45
+        }
+      ],
+      "recommended_scenario_id": "scale-pool",
+      "risk_score": 0.2
+    },
+    "action_plan": {
+      "actions": [
+        {
+          "id": "pagerduty",
+          "type": "pagerduty",
+          "target": "auth",
+          "description": "Create PagerDuty incident",
+          "risk": 0.1
+        },
+        {
+          "id": "scale",
+          "type": "scale",
+          "target": "auth",
+          "description": "Scale connection pool to 200",
+          "risk": 0.25
+        }
+      ],
+      "recommended_action_id": "scale",
+      "requires_human_approval": true,
+      "rationale": "High severity requires human approval before pool scaling."
+    },
+    "status": "awaiting_approval",
+    "human_approved": null,
+    "human_feedback_reason": null,
+    "auto_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "langfuse_scores": {
+      "root_cause_quality": 0.82,
+      "scenario_realism": 0.82,
+      "action_safety": 0.82
+    },
+    "span_ids": {},
+    "simulation": {
+      "simulation_id": "4e775015-d701-489c-b37e-e916dc58a7f8",
+      "steps": [
+        {
+          "step_id": "TWIN_BOOT",
+          "name": "Boot Digital Twin",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905275",
+          "detail": "simulation engine online :: incident=ac50d834"
+        },
+        {
+          "step_id": "TOPOLOGY_LOADED",
+          "name": "Load Topology",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905283",
+          "detail": "nodes=3 edges=3"
+        },
+        {
+          "step_id": "FAULT_INJECTED",
+          "name": "Inject Fault",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905286",
+          "detail": "fault@message-queue type=connection_pool_exhaustion"
+        },
+        {
+          "step_id": "CASCADE_SIMULATED",
+          "name": "Propagate Cascade",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905289",
+          "detail": "blast_radius=1.0 path=message-queue \u2192 api \u2192 auth \u2192 api-gateway \u2192 frontend"
+        },
+        {
+          "step_id": "SCENARIOS_GENERATED",
+          "name": "Generate Scenarios",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905291",
+          "detail": "generated 2 intervention scenarios"
+        },
+        {
+          "step_id": "SCENARIOS_RANKED",
+          "name": "Score & Rank",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905294",
+          "detail": "ranked by risk_score :: winner=scale-pool"
+        },
+        {
+          "step_id": "RECOMMENDATION_READY",
+          "name": "Emit Recommendation",
+          "owner": "Simulator",
+          "status": "completed",
+          "timestamp": "2026-06-12T20:11:56.905297",
+          "detail": "aggregate_risk=0.2 human_gate=True"
+        }
+      ],
+      "steps_completed": [
+        "TWIN_BOOT",
+        "TOPOLOGY_LOADED",
+        "FAULT_INJECTED",
+        "CASCADE_SIMULATED",
+        "SCENARIOS_GENERATED",
+        "SCENARIOS_RANKED",
+        "RECOMMENDATION_READY"
+      ],
+      "fault_injection": {
+        "node": "message-queue",
+        "type": "connection_pool_exhaustion",
+        "injected_at": "2026-06-12T20:11:56.905309"
+      },
+      "cascade": {
+        "order": [
+          "message-queue",
+          "api",
+          "auth",
+          "api-gateway",
+          "frontend"
+        ],
+        "blast_radius_score": 1.0,
+        "affected_count": 3
+      },
+      "aggregate_risk_score": 0.2,
+      "requires_human_approval": true
+    },
+    "timeline": [
+      {
+        "state": "NEW",
+        "owner": "System",
+        "timestamp": "2026-06-12T20:11:56.891018",
+        "status": "done"
+      },
+      {
+        "state": "CLASSIFIED",
+        "owner": "Observer",
+        "timestamp": "2026-06-12T20:11:56.905588",
+        "status": "done"
+      },
+      {
+        "state": "ANALYZING",
+        "owner": "Scientist",
+        "timestamp": "2026-06-12T20:11:56.905590",
+        "status": "done"
+      },
+      {
+        "state": "SIMULATING",
+        "owner": "Simulator",
+        "timestamp": "2026-06-12T20:11:56.905591",
+        "status": "done"
+      },
+      {
+        "state": "AWAITING_APPROVAL",
+        "owner": "Incident Commander",
+        "timestamp": "2026-06-12T20:11:56.905592",
+        "status": "active"
+      },
+      {
+        "state": "RESOLVED",
+        "owner": "Incident Commander",
+        "timestamp": "2026-06-12T20:11:56.905594",
+        "status": "pending"
+      }
+    ],
+    "change_log": [
+      {
+        "timestamp": "2026-06-12T20:11:56.903982",
+        "actor": "Observer",
+        "field": "status",
+        "old_value": "pending",
+        "new_value": "classified",
+        "detail": "Event classified"
+      },
+      {
+        "timestamp": "2026-06-12T20:11:56.904021",
+        "actor": "Observer",
+        "field": "severity_label",
+        "old_value": null,
+        "new_value": "HIGH",
+        "detail": "connection_pool_exhaustion"
+      },
+      {
+        "timestamp": "2026-06-12T20:11:56.904869",
+        "actor": "Scientist",
+        "field": "root_cause",
+        "old_value": null,
+        "new_value": "connection_pool_exhaustion",
+        "detail": "confidence=91%"
+      },
+      {
+        "timestamp": "2026-06-12T20:11:56.905325",
+        "actor": "Simulator",
+        "field": "recommended_scenario",
+        "old_value": null,
+        "new_value": "scale-pool",
+        "detail": "risk=20%"
+      },
+      {
+        "timestamp": "2026-06-12T20:11:56.905569",
+        "actor": "Response",
+        "field": "recommended_action",
+        "old_value": null,
+        "new_value": "scale",
+        "detail": "High severity requires human approval before pool scaling."
+      }
+    ],
+    "prompt_version": "scientist-root-cause@production",
+    "incident_commander": "on-call-engineer",
+    "created_at": "2026-06-12T20:11:56.891018",
+    "resolved_at": null
   }
 ]
