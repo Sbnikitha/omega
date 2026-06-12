@@ -4,14 +4,23 @@ backend/__pycache__/
 **/__pycache__/
 *.pyc
 backend/.env
-web/.env
-web/.env.local
-web/.env*.local
+backend/.env.*
+!backend/.env.example
 
-# Node
+# Node / Next.js secrets
 web/node_modules/
 web/.next/
 web/out/
+web/.env
+web/.env.local
+web/.env*.local
+!web/.env.example
 
-# OS
+# Other secret patterns
+*.pem
+credentials.json
+.secrets
+
+# OS / tools
 .DS_Store
+.rocketride/
