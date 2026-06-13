@@ -214,6 +214,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (!res.ok) {
     const text = await res.text();
+    try {
+      const json = JSON.parse(text) as { message?: string; hint?: string; error?: string };
+      const msg = [json.message, json.hint, json.error].filter(Boolean).join(" — ");
+      if (msg) throw new Error(msg);
+    } catch (e) {
+      if (e instanceof Error && e.message && !e.message.startsWith("Unexpected")) throw e;
+    }
     throw new Error(text || `Request failed: ${res.status}`);
   }
   return res.json() as Promise<T>;

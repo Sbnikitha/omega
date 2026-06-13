@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.agents.graph import run_incident_pipeline
 from app.config import get_settings
@@ -80,10 +81,19 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins(),
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(_request: Request, exc: Exception):
+    if isinstance(exc, HTTPException):
+        raise exc
+    logger.exception("Unhandled error: %s", exc)
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
 @app.get("/health")
